@@ -1,0 +1,132 @@
+schema_version = 1
+paper = "UltraVec ANN / VLDB Journal"
+status = "validated-clean-evidence"
+
+# Retained bundles record clean computation hashes and authoring commits in their
+# manifests. Portable validation does not require the authoring repository's Git
+# history; strict validation does.
+
+[[claim]]
+id = "fixed_codec_mips_recall_at_2_to_4_bits"
+enabled = true
+required_experiments = ["flat16-sift", "flat16-gist", "flat16-dbpedia"]
+
+[[claim]]
+id = "official_erabitq_fitted_hybrid_gap"
+enabled = true
+required_experiments = ["official-rabitq-preparation", "official-erabitq-bootstrap"]
+
+[[claim]]
+id = "measured_system_tradeoffs"
+enabled = true
+required_experiments = ["systems16-ivf-sift1m", "systems16-hnsw-sift1m", "systems-faiss-sift1m", "systems-scann-sift1m"]
+
+[[claim]]
+id = "shift_transfer_loss_without_refit"
+enabled = true
+required_experiments = ["shift-sift"]
+
+[[claim]]
+id = "estimator_scale_control"
+enabled = true
+required_experiments = ["mechanism-inputs", "mechanism-statistics"]
+
+[[claim]]
+id = "cold_start_calibration_advantage"
+enabled = true
+required_experiments = ["coldstart-sift", "coldstart-glove"]
+
+[[claim]]
+id = "warm_fitted_boundary"
+enabled = true
+required_experiments = ["dehub-strong-baselines"]
+
+[[claim]]
+id = "trellis_design_ablations"
+enabled = true
+required_experiments = ["appendix-ablations"]
+
+# The manuscript's central mechanism statement: trellis memory raises direction
+# fidelity at a fixed emitted rate.
+[[claim]]
+id = "memory_raises_direction_fidelity_at_fixed_rate"
+enabled = true
+required_experiments = ["mechanism-msweep"]
+
+# The closest published comparator is reimplemented in the shared harness, so the
+# manuscript has to show that implementation is competitive with the real library
+# under one identical task rather than asking the reader to assume it.
+[[claim]]
+id = "artifact_erabitq_matches_upstream_under_matched_centering"
+enabled = true
+required_experiments = ["erab-parity"]
+
+# The cold-start crossover is a property of the PQ factorization, not of PQ. Holding
+# the emitted rate fixed and varying the subquantizer width is what separates the two.
+[[claim]]
+id = "coldstart_crossover_depends_on_pq_factorization"
+enabled = true
+required_experiments = ["coldstart-pq-width"]
+
+# Centering is corpus state, so the variant is reported as a fit and priced like one:
+# the claim is about how little data the mean needs, not that it is free.
+[[claim]]
+id = "centering_is_the_cheapest_fit_on_the_calibration_axis"
+enabled = true
+required_experiments = ["center-sample-efficiency"]
+
+# Finer centering lifts the whole field rather than one codec, which is the reason
+# the paper reports it as shared preprocessing. Claimed because Section 7.4 quotes
+# its cells and margins; it was retained as evidence for a claim nothing declared.
+[[claim]]
+id = "centering_granularity_lifts_the_field_not_one_codec"
+enabled = true
+required_experiments = ["centering-granularity"]
+
+# The reported cells are one draw from the rotation distribution. Margins of about a
+# point cannot be interpreted without knowing how far the draw moves them.
+# Tail-biting removes the stored start state at a price that scales as M/(D*b):
+# near zero on the embedding corpora, several points on SIFT. Reported as an arm,
+# not adopted, so every other table keeps the free-start record.
+[[claim]]
+id = "tail_biting_costs_scale_with_the_pinned_fraction"
+enabled = true
+required_experiments = ["tail-biting-sweep"]
+
+[[claim]]
+id = "narrow_margin_cells_characterised_across_rotation_draws"
+enabled = true
+required_experiments = ["rotation16-gist", "rotation16-dbpedia"]
+
+# The operating point M=12 is selected on a two-bit sweep. Whether it is also right
+# at one bit is a separate question, and the start state's byte tier means the answer
+# can be free in record size.
+[[claim]]
+id = "trellis_memory_operating_point_is_rate_dependent"
+enabled = true
+required_experiments = ["rate-memory-sweep"]
+
+[[claim]]
+id = "encode_cost_prices_the_memory_lever"
+enabled = true
+required_experiments = ["encode-cost"]
+
+[[claim]]
+id = "vector_trellis_adds_nothing_at_matched_rate"
+enabled = true
+required_experiments = ["vector-trellis"]
+
+[[claim]]
+id = "shortlist_scorer_choice_is_measured_not_assumed"
+enabled = true
+required_experiments = ["shortlist-scorer-ab"]
+
+[[claim]]
+id = "residual_control_variate_priced_against_its_bytes"
+enabled = true
+required_experiments = ["residual-control-variate"]
+
+[[claim]]
+id = "flat_ordering_holds_at_one_million_vectors"
+enabled = true
+required_experiments = ["flat1m-sift"]

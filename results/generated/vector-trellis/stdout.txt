@@ -1,0 +1,22 @@
+Vector trellis: recall and cost against V at a fixed emitted rate (normalized SIFT-128, 100,000 base, 1,000 queries, mem=12, seed 42)
+The emitted payload is dim*bits bits for every V; only the cell shape, the table size and the encode cost change.
+
+| bits | V | table entries | R@1 | R@10 | R@100 | code B | encode vec/s |
+|---|---|---|---|---|---|---|---|
+| 2 | 1 | 16,384 | 0.5170 | 0.6210 | 0.7020 | 38 | 17,844 |
+| 2 | 2 | 65,536 | 0.5320 | 0.6140 | 0.7090 | 38 | 903 |
+| 2 | 4 | 1,048,576 | 0.5280 | 0.6280 | 0.7100 | 38 | 126 |
+| 3 | 1 | 32,768 | 0.7170 | 0.8000 | 0.8490 | 54 | 9,068 |
+| 3 | 2 | 262,144 | 0.7110 | 0.7990 | 0.8490 | 54 | 319 |
+| 4 | 1 | 65,536 | 0.8320 | 0.8910 | 0.9240 | 70 | 4,623 |
+| 4 | 2 | 1,048,576 | 0.8540 | 0.8900 | 0.9250 | 70 | 99 |
+
+=== V>1 minus V=1, Recall@10 (percentage points) ===
+| bits | V | delta pp |
+|---|---|---|
+| 2 | 2 | -0.70 |
+| 2 | 4 | +0.70 |
+| 3 | 2 | -0.10 |
+| 4 | 2 | -0.10 |
+
+DONE vector_trellis

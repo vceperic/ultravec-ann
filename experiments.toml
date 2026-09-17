@@ -1,0 +1,1049 @@
+schema_version = 1
+
+[artifact]
+name = "ultravec-ann"
+default_seed = 42
+results_dir = "results/generated"
+
+[tiers.check]
+description = "Portable locked build and correctness tests"
+required_files = ["Cargo.lock"]
+
+[[tiers.check.steps]]
+name = "format"
+argv = ["cargo", "fmt", "--all", "--", "--check"]
+
+[[tiers.check.steps]]
+name = "unit-tests"
+argv = ["cargo", "test", "--locked", "--all-targets"]
+
+[[tiers.check.steps]]
+name = "runner-tests"
+argv = ["python3", "-m", "unittest", "discover", "-s", "scripts", "-p", "test_*.py", "-v"]
+
+[tiers.smoke]
+description = "Deterministic synthetic run through the principal codec harness"
+required_files = ["Cargo.lock"]
+
+[[tiers.smoke.steps]]
+name = "synthetic-input"
+argv = ["python3", "scripts/generate_smoke_data.py"]
+
+[[tiers.smoke.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.smoke.steps]]
+name = "synthetic-low-bit"
+experiment = "smoke-synthetic"
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/smoke/base.fvecs", "--query-file", "data/smoke/query.fvecs", "--query-max", "16", "--max", "128", "--bits", "2", "--seed", "42", "--sota3", "--per-query-out", "results/generated/smoke-synthetic/per-query.csv"]
+
+[tiers.core]
+description = "Core recall and cold-start evidence on SIFT and GloVe"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+  "data/source/glove-25-angular.hdf5",
+]
+
+[[tiers.core.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.core.steps]]
+name = "prepare-glove"
+argv = ["python3", "scripts/prepare_glove.py"]
+
+[[tiers.core.steps]]
+name = "sift-recall"
+experiment = "common-reconstruction-sift"
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/sift/sift_base.fvecs", "--query-file", "data/sift/sift_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1,2,3,4", "--metric", "ip", "--seed", "42", "--sota3", "--per-query-out", "results/generated/common-reconstruction-sift/per-query.csv"]
+
+[[tiers.core.steps]]
+name = "coldstart-sift-ci"
+experiment = "coldstart-sift"
+seed = 42 # base seed; the script evaluates the fixed sequence 42..47
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["python3", "scripts/coldstart_seed_ci.py"]
+
+[[tiers.core.steps]]
+name = "coldstart-glove-ci"
+experiment = "coldstart-glove"
+seed = 42 # base seed; the script evaluates the fixed sequence 42..47
+datasets = ["data/glove/glove_base.fvecs", "data/glove/glove_query.fvecs"]
+argv = ["python3", "scripts/coldstart_glove_seed_ci.py"]
+
+[tiers.systems]
+description = "SIFT1M IVF and HNSW recall-throughput evidence"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+]
+
+# The IVF comparison codes every codec's residual to its coarse centroid -- the step
+# RaBitQ's own construction is published with. It is declared here rather than left to
+# the launching shell, because a shell-set knob reproduces as its own absence.
+[tiers.systems.env]
+ULTRAVEC_IVF_CENTER = "1"
+
+[[tiers.systems.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.systems.steps]]
+name = "ivf-pareto"
+experiment = "systems-ivf-sift1m"
+argv = ["cargo", "run", "--locked", "--release", "--", "ivf", "--dataset", "data/sift/sift_base.fvecs", "--query-file", "data/sift/sift_query.fvecs", "--max", "1000000", "--query-max", "200", "--bits", "2", "--nlist", "1024", "--nprobe", "1,2,4,8,16,32,64,128", "--shortlist", "128,256,512", "--reps", "3", "--seed", "42"]
+
+[[tiers.systems.steps]]
+name = "hnsw-pareto"
+experiment = "systems-hnsw-sift1m"
+argv = ["cargo", "run", "--locked", "--release", "--", "hnsw", "--dataset", "data/sift/sift_base.fvecs", "--query-file", "data/sift/sift_query.fvecs", "--max", "1000000", "--query-max", "200", "--bits", "2", "--m", "16", "--ef-construction", "200", "--ef", "16,32,64,128,256", "--codecs", "fp32,trellis,trellis_codes_only,rabitq,baseline", "--reps", "3", "--seed", "42"]
+
+# The stage-1 scorer is a reported design choice, so it carries evidence rather than a
+# default nobody measured. Centering is declared because the residual-norm lever only
+# exists under it -- and because the reported arm is centered.
+[tiers.shortlist]
+description = "Shortlist stage-1 scorer: asymmetric vs symmetric, and the residual-norm weight"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+]
+
+[tiers.shortlist.env]
+ULTRAVEC_IVF_CENTER = "1"
+
+[[tiers.shortlist.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.shortlist.steps]]
+name = "shortlist-scorer-ab"
+experiment = "shortlist-scorer-ab"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["python3", "scripts/shortlist_scorer_ab.py"]
+
+# The control variate is an estimator change, not a reconstruction change, so it is
+# measured by search recall rather than by `recon` -- the correction lives in `score`
+# and a reconstruction-based driver would be blind to it.
+[tiers.resid]
+description = "Residual control variate on the trellis base, bit-matched against a finer base"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+]
+
+[[tiers.resid.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.resid.steps]]
+name = "residual-control-variate"
+experiment = "residual-control-variate"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["python3", "scripts/residual_control_variate.py"]
+
+# The one-bit operating point. `tab:ratemem` measures M=14 worth +1.14 points at one
+# bit for an unchanged 22-byte record, but under exact-cosine gold on normalized
+# SIFT-128 -- a different protocol from the flat comparison. This tier asks the same
+# question under the flat table's own protocol, on all three corpora, which is the only
+# footing on which a reported cell may move. The memory is DECLARED rather than
+# inherited so the bundle records which operating point produced it.
+[tiers.lowrate]
+description = "One-bit cells at M=14 under the flat protocol (raw-IP gold, three corpora)"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/gist/gist_base.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs",
+]
+
+[tiers.lowrate.env]
+ULTRAVEC_TRELLIS_MEM = "14"
+
+[[tiers.lowrate.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.lowrate.steps]]
+name = "sift-recall-m14"
+experiment = "lowrate-sift-m14"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/sift/sift_base.fvecs", "--query-file", "data/sift/sift_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1", "--metric", "ip", "--seed", "42", "--sota3"]
+
+[[tiers.lowrate.steps]]
+name = "gist-recall-m14"
+experiment = "lowrate-gist-m14"
+seed = 42
+datasets = ["data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/gist/gist_base.fvecs", "--query-file", "data/gist/gist_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1", "--metric", "ip", "--seed", "42", "--sota3"]
+
+[[tiers.lowrate.steps]]
+name = "dbpedia-recall-m14"
+experiment = "lowrate-dbpedia-m14"
+seed = 42
+datasets = ["data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/dbpedia/dbpedia_base.fvecs", "--query-file", "data/dbpedia/dbpedia_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1", "--metric", "ip", "--seed", "42", "--sota3"]
+
+# Its own tier rather than a fourth step of `lowrate`: the GIST one-bit cell is the
+# only one whose verdict depends on the rotation draw, and re-running the three flat
+# benches to get at it would cost half an hour for nothing.
+[tiers.lowrate-rotation]
+description = "Rotation-draw verdict for the GIST one-bit cell at M=14"
+required_files = [
+  "Cargo.lock",
+  "data/gist/gist_base.fvecs",
+  "data/gist/gist_query.fvecs",
+]
+
+[tiers.lowrate-rotation.env]
+ULTRAVEC_TRELLIS_MEM = "14"
+
+[[tiers.lowrate-rotation.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.lowrate-rotation.steps]]
+name = "rotation-seed-ci-m14"
+experiment = "lowrate-rotation-m14"
+seed = 42
+datasets = ["data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs"]
+argv = ["python3", "scripts/rotation_seed_ci.py", "--corpora", "GIST", "--rates", "1"]
+
+# Separate from the GIST tier so neither has to be re-run to get at the other: each is
+# five full draws of a 100k bench at M=14 and costs over an hour. DBpedia's one-bit cell
+# is not in doubt -- it led every draw at M=12 -- but the reported cell moves to M=14, so
+# the rotation evidence behind it has to move too or the table mixes operating points.
+[tiers.lowrate-rotation-dbpedia]
+description = "Rotation-draw verdict for the DBpedia one-bit cell at M=14"
+required_files = [
+  "Cargo.lock",
+  "data/dbpedia/dbpedia_base.fvecs",
+  "data/dbpedia/dbpedia_query.fvecs",
+]
+
+[tiers.lowrate-rotation-dbpedia.env]
+ULTRAVEC_TRELLIS_MEM = "14"
+
+[[tiers.lowrate-rotation-dbpedia.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.lowrate-rotation-dbpedia.steps]]
+name = "rotation-seed-ci-m14-dbpedia"
+experiment = "lowrate-rotation-m14-dbpedia"
+seed = 42
+datasets = ["data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs"]
+argv = ["python3", "scripts/rotation_seed_ci.py", "--corpora", "DBpedia", "--rates", "1"]
+
+# Centering granularity. The driver injects ULTRAVEC_IVF_NLIST / ULTRAVEC_CENTER per
+# subprocess (the appendix_ablations pattern), so nothing is inherited from the shell
+# and the tier stays declarative.
+[tiers.centering-granularity]
+description = "How fine centering should be, and what each granularity costs in bytes"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+]
+
+[[tiers.centering-granularity.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.centering-granularity.steps]]
+name = "centering-granularity"
+experiment = "centering-granularity"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["python3", "scripts/centering_granularity.py"]
+
+# Fifteen rotation draws on the GIST cells whose verdict is decided by the draw. The
+# published five leave a t-interval wider than the margin it brackets; fifteen is 2.24x
+# tighter and is the only axis that can settle those cells, since GIST's query file
+# holds exactly 1,000 records and cannot be extended.
+[tiers.rotation-draws]
+description = "Optional deep dive: fifteen rotation draws per tabulated cell at M=16"
+# Not the source of any reported number -- the paper reports the five-draw study in
+# `rotation16`, and this tier is kept because the flag is useful, not because it ran.
+# It costs roughly 170 h: about 6.4 h per GIST draw at M=16 across four rates, and
+# again for DBpedia. Restrict it with --corpora/--rates before reaching for it.
+required_files = [
+  "Cargo.lock",
+  "data/gist/gist_base.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs",
+]
+
+[tiers.rotation-draws.env]
+ULTRAVEC_TRELLIS_MEM = "16"
+
+[[tiers.rotation-draws.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.rotation-draws.steps]]
+name = "rotation-draws-gist"
+experiment = "rotation-draws-gist"
+seed = 42
+datasets = ["data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs"]
+argv = ["python3", "scripts/rotation_seed_ci.py", "--draws", "15"]
+
+# The flat comparison at the operating point every codec is now best at: UltraVec at
+# M=16 (byte-identical to M=12 -- the start state is two bytes for every M from 9 to 16
+# -- and worth a point at two bits), PVQ at the block its record already pays for, and
+# BlockQuant at the width its codebook budget already admits.
+[tiers.flat16]
+description = "Flat MIPS comparison with every codec at its best setting for its bytes"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/gist/gist_base.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs",
+]
+
+[tiers.flat16.env]
+ULTRAVEC_TRELLIS_MEM = "16"
+
+[[tiers.flat16.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.flat16.steps]]
+name = "sift-recall-m16"
+experiment = "flat16-sift"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/sift/sift_base.fvecs", "--query-file", "data/sift/sift_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1,2,3,4", "--metric", "ip", "--seed", "42", "--sota3"]
+
+[[tiers.flat16.steps]]
+name = "gist-recall-m16"
+experiment = "flat16-gist"
+seed = 42
+datasets = ["data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/gist/gist_base.fvecs", "--query-file", "data/gist/gist_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1,2,3,4", "--metric", "ip", "--seed", "42", "--sota3"]
+
+[[tiers.flat16.steps]]
+name = "dbpedia-recall-m16"
+experiment = "flat16-dbpedia"
+seed = 42
+datasets = ["data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/dbpedia/dbpedia_base.fvecs", "--query-file", "data/dbpedia/dbpedia_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1,2,3,4", "--metric", "ip", "--seed", "42", "--sota3"]
+
+# The flat comparison at one million, on the one corpus whose full base is staged and
+# whose codes fit in RAM at every rate. The 100k tables stay: every other corpus is at
+# 100k and the cross-corpus comparison has to stay matched, so this is an additional
+# scale point rather than a replacement. Feasible only since the ground truth became
+# parallel -- at 1M the old serial gold was the whole cost of the run.
+[tiers.flat1m]
+description = "Flat MIPS comparison on SIFT at one million base vectors, M=16"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+]
+
+[tiers.flat1m.env]
+ULTRAVEC_TRELLIS_MEM = "16"
+
+[[tiers.flat1m.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.flat1m.steps]]
+name = "sift1m-recall-m16"
+experiment = "flat1m-sift"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/sift/sift_base.fvecs", "--query-file", "data/sift/sift_query.fvecs", "--query-max", "1000", "--max", "1000000", "--bits", "1,2,3,4", "--metric", "ip", "--seed", "42", "--sota3"]
+
+# SIFT1M IVF and HNSW at the operating point the codec is actually best at. The systems
+# tables ran at M=12 only because encoding at 16 was unaffordable before the encoder
+# scratch fix; the record is byte-identical, so this is recall at unchanged storage.
+[tiers.systems16]
+description = "SIFT1M IVF and HNSW evidence at M=16"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+]
+
+[tiers.systems16.env]
+ULTRAVEC_TRELLIS_MEM = "16"
+ULTRAVEC_IVF_CENTER = "1"
+
+[[tiers.systems16.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.systems16.steps]]
+name = "ivf-pareto-m16"
+experiment = "systems16-ivf-sift1m"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "ivf", "--dataset", "data/sift/sift_base.fvecs", "--query-file", "data/sift/sift_query.fvecs", "--max", "1000000", "--query-max", "200", "--bits", "2", "--nlist", "1024", "--nprobe", "1,2,4,8,16,32,64,128", "--shortlist", "128,256,512", "--reps", "3", "--seed", "42"]
+
+[[tiers.systems16.steps]]
+name = "hnsw-pareto-m16"
+experiment = "systems16-hnsw-sift1m"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "hnsw", "--dataset", "data/sift/sift_base.fvecs", "--query-file", "data/sift/sift_query.fvecs", "--max", "1000000", "--query-max", "200", "--bits", "2", "--m", "16", "--ef-construction", "200", "--ef", "16,32,64,128,256", "--codecs", "fp32,trellis,trellis_codes_only,rabitq,baseline", "--reps", "3", "--seed", "42"]
+
+# GIST and DBpedia at M=16, completing the flat comparison so all three corpora share
+# one operating point. Split from `flat16` only so the finished SIFT step is not re-run;
+# the argv are identical to that tier's.
+[tiers.flat16-rest]
+description = "Flat MIPS comparison at M=16, GIST and DBpedia"
+required_files = [
+  "Cargo.lock",
+  "data/gist/gist_base.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs",
+]
+
+[tiers.flat16-rest.env]
+ULTRAVEC_TRELLIS_MEM = "16"
+
+[[tiers.flat16-rest.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.flat16-rest.steps]]
+name = "gist-recall-m16"
+experiment = "flat16-gist"
+seed = 42
+datasets = ["data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/gist/gist_base.fvecs", "--query-file", "data/gist/gist_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1,2,3,4", "--metric", "ip", "--seed", "42", "--sota3"]
+
+[[tiers.flat16-rest.steps]]
+name = "dbpedia-recall-m16"
+experiment = "flat16-dbpedia"
+seed = 42
+datasets = ["data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs"]
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/dbpedia/dbpedia_base.fvecs", "--query-file", "data/dbpedia/dbpedia_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1,2,3,4", "--metric", "ip", "--seed", "42", "--sota3"]
+
+[tiers.mechanism]
+description = "Fidelity/MSE identifiability diagnostic and estimator-axis control"
+required_files = [
+  "Cargo.lock",
+  "data/siftsmall/siftsmall_base.fvecs",
+  "data/siftsmall/siftsmall_query.fvecs",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+  "data/source/glove-25-angular.hdf5",
+  "data/gist/gist_base.fvecs",
+  "data/gist/gist_query.fvecs",
+]
+
+[[tiers.mechanism.steps]]
+# The mechanism drivers invoke the release binary directly.
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.mechanism.steps]]
+name = "prepare-glove"
+argv = ["python3", "scripts/prepare_glove.py"]
+
+[[tiers.mechanism.steps]]
+name = "mechanism-inputs"
+experiment = "mechanism-inputs"
+seed = 42
+datasets = [
+  "data/siftsmall/siftsmall_base.fvecs", "data/siftsmall/siftsmall_query.fvecs",
+  "data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs",
+  "data/glove/glove_base.fvecs", "data/glove/glove_query.fvecs",
+  "data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs",
+]
+argv = ["python3", "scripts/generate_mechanism_inputs.py"]
+
+[[tiers.mechanism.steps]]
+name = "mechanism-statistics"
+experiment = "mechanism-statistics"
+seed = 42
+depends_on = ["mechanism-inputs"]
+datasets = [
+  "data/siftsmall/siftsmall_base.fvecs", "data/siftsmall/siftsmall_query.fvecs",
+  "data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs",
+  "data/glove/glove_base.fvecs", "data/glove/glove_query.fvecs",
+  "data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs",
+]
+argv = ["python3", "scripts/mechanism_pvalues.py"]
+
+# Focused tiers expose individual studies without requiring the complete campaign.
+[tiers.shift]
+description = "Controlled SIFT covariate shift: transferred PQ against the fixed codec"
+required_files = ["Cargo.lock", "data/sift/sift_base.fvecs"]
+
+[[tiers.shift.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.shift.steps]]
+name = "sift-distribution-shift"
+experiment = "shift-sift"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs"]
+argv = ["python3", "scripts/ann_distshift.py"]
+
+[tiers.erab]
+description = "Official E-RaBitQ bootstrap against the fitted PCA-head residual hybrid"
+required_files = ["Cargo.lock", "data/erab/base.fvecs", "data/erab/query.fvecs"]
+
+[[tiers.erab.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.erab.steps]]
+name = "official-erabitq-bootstrap"
+experiment = "official-erabitq-bootstrap"
+seed = 42
+# Verbatim from `full`: validate_claims rejects an experiment two tiers define
+# differently, which is what makes a focused tier trustworthy.
+datasets = [
+  "data/erab/base.fvecs",
+  "data/erab/query.fvecs",
+  "data/erab/gold.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b1.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b2.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b3.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b4.ivecs",
+]
+argv = ["python3", "scripts/erab_bootstrap_ci.py"]
+
+[tiers.rotation]
+description = "Rotation-draw variability for the narrow-margin GIST and DBpedia cells"
+required_files = [
+  "Cargo.lock",
+  "data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs",
+]
+
+[[tiers.rotation.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.rotation.steps]]
+name = "rotation-seed-ci"
+experiment = "rotation-seed-ci"
+seed = 42 # query seed, held fixed; the rotation draws are 42, 7, 13, 29, 101
+datasets = [
+  "data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs",
+]
+argv = ["python3", "scripts/rotation_seed_ci.py"]
+
+# The rotation study at the operating point the reported cells actually use. Table 3
+# moved to M=16 while the draw study behind its narrow cells stayed at M=12 (`rotation`)
+# and M=14 (`lowrate-rotation*`), so a table reported at one memory was being scoped by
+# a sweep run at another -- and Section 5.3 itself shows the draw sensitivity changes
+# with M. The three earlier bundles are retained and no longer cited.
+#
+# Two evidence steps rather than one: GIST is roughly two days of encoding and DBpedia
+# most of another, and a crash in the second corpus should not discard the first. Both
+# steps declare the same memory, so splitting them mixes no protocol.
+[tiers.rotation16]
+description = "Rotation-draw variability for the narrow-margin GIST and DBpedia cells at M=16"
+required_files = [
+  "Cargo.lock",
+  "data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs",
+]
+
+[tiers.rotation16.env]
+ULTRAVEC_TRELLIS_MEM = "16"
+
+[[tiers.rotation16.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.rotation16.steps]]
+name = "rotation16-gist"
+experiment = "rotation16-gist"
+seed = 42 # query seed, held fixed; the rotation draws are 42, 7, 13, 29, 101
+datasets = ["data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs"]
+argv = ["python3", "scripts/rotation_seed_ci.py", "--corpora", "GIST"]
+
+[[tiers.rotation16.steps]]
+name = "rotation16-dbpedia"
+experiment = "rotation16-dbpedia"
+seed = 42 # query seed, held fixed; the rotation draws are 42, 7, 13, 29, 101
+datasets = ["data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs"]
+argv = ["python3", "scripts/rotation_seed_ci.py", "--corpora", "DBpedia"]
+
+# Fifteen draws on the cells the five-draw study cannot settle. The rule is stated so
+# the restriction is not a choice made after seeing which cells we would like to win:
+# a cell qualifies when its five-draw t-interval SPANS ZERO, so the study has not
+# decided it either way. At M=16 that is GIST at one and two bits (intervals
+# [-0.36,+1.68] and [-0.62,+1.22]); the three-bit cell leads every draw and the
+# four-bit interval already excludes zero, so neither needs more draws.
+#
+# The extra draws extend the published five deterministically rather than replacing
+# them, so the reported draws stay a subset of the deeper study. t(0.975,n-1)/sqrt(n)
+# falls from 1.24 to 0.55 between five draws and fifteen, so an interval this wide can
+# be settled without the margin itself having to move.
+# Tail-biting: the start-state byte, measured where it pays and where it does not.
+# The wrap pins ceil(M/b) emissions, a fraction M/(D*b) of the payload that shrinks
+# with dimension, so a SIFT-only ablation would show the lever at its worst and
+# nowhere else. Every row is UltraVec against itself at the reported operating point,
+# across the rotation study's own five draws because two-bit GIST is decided by the
+# draw. Two bits only: that is the rate every headline byte comparison is made at.
+[tiers.tailbite]
+description = "Tail-biting against free start on all three corpora, five rotation draws, M=16"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs",
+  "data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs",
+]
+
+[tiers.tailbite.env]
+ULTRAVEC_TRELLIS_MEM = "16"
+
+[[tiers.tailbite.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.tailbite.steps]]
+name = "tail-biting-sweep"
+experiment = "tail-biting-sweep"
+seed = 42 # query seed, held fixed; the rotation draws are 42, 7, 13, 29, 101
+datasets = [
+  "data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs",
+  "data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs",
+]
+argv = ["python3", "scripts/tail_biting_sweep.py"]
+
+[tiers.rotation16-deep]
+description = "Fifteen rotation draws at M=16 on the GIST cells whose five-draw interval spans zero"
+required_files = [
+  "Cargo.lock",
+  "data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs",
+]
+
+[tiers.rotation16-deep.env]
+ULTRAVEC_TRELLIS_MEM = "16"
+
+[[tiers.rotation16-deep.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.rotation16-deep.steps]]
+name = "rotation16-deep-gist"
+experiment = "rotation16-deep-gist"
+seed = 42 # query seed, held fixed; the draws extend [42, 7, 13, 29, 101]
+datasets = ["data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs"]
+argv = ["python3", "scripts/rotation_seed_ci.py", "--corpora", "GIST", "--rates", "1,2", "--draws", "15"]
+
+[tiers.centering]
+description = "Sample efficiency of the centering mean, the cheapest fit on the calibration axis"
+required_files = ["Cargo.lock", "data/erab/base.fvecs", "data/erab/query.fvecs"]
+
+[[tiers.centering.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.centering.steps]]
+name = "center-sample-efficiency"
+experiment = "center-sample-efficiency"
+# Verbatim from `parity` and `full`: validate_claims rejects an experiment that two
+# tiers define differently, which is what makes a focused tier trustworthy.
+seed = 42
+datasets = [
+  "data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b2.ivecs",
+]
+argv = ["python3", "scripts/center_sample_efficiency.py"]
+
+[[tiers.centering.steps]]
+name = "rate-memory-sweep"
+experiment = "rate-memory-sweep"
+seed = 42
+datasets = ["data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs"]
+argv = ["python3", "scripts/rate_memory_sweep.py"]
+
+[tiers.warm]
+description = "Warm fitted PQ/OPQ reference against plain trellis and the PCA-head residual hybrid"
+required_distributions = ["faiss-cpu==1.14.2"]
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/gist/gist_base.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs",
+]
+
+[[tiers.warm.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.warm.steps]]
+name = "strong-warm-baselines"
+experiment = "dehub-strong-baselines"
+# Must match the definition in `full` exactly: validate_claims.py rejects an
+# experiment that two tiers define differently, which is the point -- a focused
+# tier is only useful if it reproduces the same thing the campaign does.
+seed = 42
+datasets = [
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+  "data/gist/gist_base.fvecs",
+  "data/gist/gist_query.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs",
+  "data/dbpedia/dbpedia_query.fvecs",
+]
+argv = ["python3", "scripts/dehub_vs_strong_matched.py"]
+
+[tiers.msweep]
+description = "Direction fidelity versus trellis memory at a fixed emitted rate"
+required_files = [
+  "Cargo.lock",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+]
+
+[[tiers.msweep.steps]]
+# The memory-sweep driver invokes the release binary directly.
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.msweep.steps]]
+name = "mechanism-msweep"
+experiment = "mechanism-msweep"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["python3", "scripts/mechanism_msweep.py"]
+
+[tiers.vtrellis]
+description = "Vector trellis: recall and cost against V at a fixed emitted rate"
+required_files = ["Cargo.lock", "data/erab/base.fvecs", "data/erab/query.fvecs"]
+
+[[tiers.vtrellis.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.vtrellis.steps]]
+name = "vector-trellis"
+experiment = "vector-trellis"
+seed = 42
+datasets = ["data/erab/base.fvecs", "data/erab/query.fvecs"]
+argv = ["python3", "scripts/vector_trellis.py"]
+
+[tiers.encode]
+description = "Encode throughput versus trellis memory: what the fixed-rate quality lever costs at build time"
+required_files = ["Cargo.lock", "data/erab/base.fvecs"]
+
+[[tiers.encode.steps]]
+# The encode-cost driver invokes the release binary directly.
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.encode.steps]]
+name = "encode-cost"
+experiment = "encode-cost"
+seed = 42
+datasets = ["data/erab/base.fvecs"]
+argv = ["python3", "scripts/encode_cost.py"]
+
+# `appendix-ablations` previously existed only inside `full`, so refreshing it cost
+# a whole campaign -- which is how its retained log kept a stale `M=10` header for
+# weeks after the driver was corrected to M=12. Verbatim from `full`, as the
+# duplicate-definition check requires.
+[tiers.ablations]
+description = "Trellis design ablations: codebook, free start, beam, memory, rotation rounds, anisotropy"
+required_files = ["Cargo.lock", "data/erab/base.fvecs", "data/erab/query.fvecs"]
+
+[[tiers.ablations.steps]]
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.ablations.steps]]
+name = "appendix-ablations"
+experiment = "appendix-ablations"
+seed = 42
+datasets = ["data/erab/base.fvecs", "data/erab/query.fvecs"]
+argv = ["python3", "scripts/appendix_ablations.py"]
+
+[tiers.parity]
+description = "Baseline-implementation parity and the cold-start PQ factorization control"
+required_files = [
+  "data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b1.ivecs", "data/erab/ivfA/erabIVF_n1_b2.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b3.ivecs", "data/erab/ivfA/erabIVF_n1_b4.ivecs",
+  "data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs",
+  "data/glove/glove_base.fvecs", "data/glove/glove_query.fvecs",
+]
+
+[[tiers.parity.steps]]
+# Both drivers invoke the release binary directly.
+name = "release-build"
+argv = ["cargo", "build", "--locked", "--release"]
+
+[[tiers.parity.steps]]
+name = "erab-parity"
+experiment = "erab-parity"
+seed = 42
+datasets = [
+  "data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b1.ivecs", "data/erab/ivfA/erabIVF_n1_b2.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b3.ivecs", "data/erab/ivfA/erabIVF_n1_b4.ivecs",
+]
+argv = ["python3", "scripts/erab_parity.py"]
+
+[[tiers.parity.steps]]
+name = "coldstart-pq-width"
+experiment = "coldstart-pq-width"
+seed = 42
+datasets = [
+  "data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs",
+  "data/glove/glove_base.fvecs", "data/glove/glove_query.fvecs",
+]
+argv = ["python3", "scripts/coldstart_pq_width.py"]
+
+[[tiers.parity.steps]]
+name = "center-sample-efficiency"
+experiment = "center-sample-efficiency"
+seed = 42 # base seed; the driver evaluates the fixed draw sequence 42..47
+datasets = [
+  "data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b2.ivecs",
+]
+argv = ["python3", "scripts/center_sample_efficiency.py"]
+
+[tiers.scann]
+description = "Targeted seeded ScaNN reference and determinism check"
+required_distributions = ["scann==1.4.2"]
+required_files = [
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+]
+
+[[tiers.scann.steps]]
+name = "scann-qps"
+experiment = "systems-scann-sift1m"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["python3", "scripts/scann_qps.py", "--seed", "42", "--verify-determinism"]
+
+# The verified-inputs stamp is created by `prepare`, so it is intentionally not a
+# precondition of `prepare` or `full`.
+[tiers.full]
+description = "All ANN tables and figures from verified public inputs and pinned baselines, including the memory sweep"
+required_distributions = ["faiss-cpu==1.14.2", "scann==1.4.2"]
+required_files = [
+  "Cargo.lock",
+  "data/siftsmall/siftsmall_base.fvecs",
+  "data/siftsmall/siftsmall_query.fvecs",
+  "data/sift/sift_base.fvecs",
+  "data/sift/sift_query.fvecs",
+  "data/gist/gist_base.fvecs",
+  "data/gist/gist_query.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs",
+  "data/dbpedia/dbpedia_query.fvecs",
+]
+
+[[tiers.full.steps]]
+name = "prepare"
+tier = "prepare"
+
+[[tiers.full.steps]]
+name = "full-gate"
+argv = ["python3", "scripts/validate_claims.py", "--schema-only"]
+
+[[tiers.full.steps]]
+name = "runner-tests"
+argv = ["python3", "-m", "unittest", "discover", "-s", "scripts", "-p", "test_*.py", "-v"]
+
+[[tiers.full.steps]]
+name = "core"
+tier = "core"
+
+[[tiers.full.steps]]
+name = "systems"
+tier = "systems"
+
+[[tiers.full.steps]]
+name = "gist-recall"
+experiment = "common-reconstruction-gist"
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/gist/gist_base.fvecs", "--query-file", "data/gist/gist_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1,2,3,4", "--metric", "ip", "--seed", "42", "--sota3", "--per-query-out", "results/generated/common-reconstruction-gist/per-query.csv"]
+
+[[tiers.full.steps]]
+name = "dbpedia-recall"
+experiment = "common-reconstruction-embedding"
+argv = ["cargo", "run", "--locked", "--release", "--", "bench", "--dataset", "data/dbpedia/dbpedia_base.fvecs", "--query-file", "data/dbpedia/dbpedia_query.fvecs", "--query-max", "1000", "--max", "100000", "--bits", "1,2,3,4", "--metric", "ip", "--seed", "42", "--sota3", "--per-query-out", "results/generated/common-reconstruction-embedding/per-query.csv"]
+
+[[tiers.full.steps]]
+name = "sift-distribution-shift"
+experiment = "shift-sift"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs"]
+argv = ["python3", "scripts/ann_distshift.py"]
+
+[[tiers.full.steps]]
+name = "strong-warm-baselines"
+experiment = "dehub-strong-baselines"
+seed = 42
+datasets = [
+  "data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs",
+  "data/gist/gist_base.fvecs", "data/gist/gist_query.fvecs",
+  "data/dbpedia/dbpedia_base.fvecs", "data/dbpedia/dbpedia_query.fvecs",
+]
+argv = ["python3", "scripts/dehub_vs_strong_matched.py"]
+
+[[tiers.full.steps]]
+name = "official-erabitq-bootstrap"
+experiment = "official-erabitq-bootstrap"
+seed = 42
+datasets = [
+  "data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b1.ivecs", "data/erab/ivfA/erabIVF_n1_b2.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b3.ivecs", "data/erab/ivfA/erabIVF_n1_b4.ivecs",
+]
+argv = ["python3", "scripts/erab_bootstrap_ci.py"]
+
+[[tiers.full.steps]]
+name = "appendix-ablations"
+experiment = "appendix-ablations"
+seed = 42
+datasets = ["data/erab/base.fvecs", "data/erab/query.fvecs"]
+argv = ["python3", "scripts/appendix_ablations.py"]
+
+[[tiers.full.steps]]
+name = "encode-cost"
+experiment = "encode-cost"
+seed = 42
+datasets = ["data/erab/base.fvecs"]
+argv = ["python3", "scripts/encode_cost.py"]
+
+[[tiers.full.steps]]
+name = "erab-parity"
+experiment = "erab-parity"
+seed = 42
+datasets = [
+  "data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b1.ivecs", "data/erab/ivfA/erabIVF_n1_b2.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b3.ivecs", "data/erab/ivfA/erabIVF_n1_b4.ivecs",
+]
+argv = ["python3", "scripts/erab_parity.py"]
+
+[[tiers.full.steps]]
+name = "coldstart-pq-width"
+experiment = "coldstart-pq-width"
+seed = 42 # base seed; the driver evaluates the fixed sequence 42..47
+datasets = [
+  "data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs",
+  "data/glove/glove_base.fvecs", "data/glove/glove_query.fvecs",
+]
+argv = ["python3", "scripts/coldstart_pq_width.py"]
+
+[[tiers.full.steps]]
+name = "center-sample-efficiency"
+experiment = "center-sample-efficiency"
+seed = 42
+datasets = [
+  "data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b2.ivecs",
+]
+argv = ["python3", "scripts/center_sample_efficiency.py"]
+
+[[tiers.full.steps]]
+name = "rate-memory-sweep"
+experiment = "rate-memory-sweep"
+seed = 42
+datasets = ["data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs"]
+argv = ["python3", "scripts/rate_memory_sweep.py"]
+
+[[tiers.full.steps]]
+name = "mechanism"
+tier = "mechanism"
+
+[[tiers.full.steps]]
+name = "msweep"
+tier = "msweep"
+
+[[tiers.full.steps]]
+name = "vtrellis"
+tier = "vtrellis"
+
+[[tiers.full.steps]]
+name = "rotation16"
+tier = "rotation16"
+
+[[tiers.full.steps]]
+name = "shortlist"
+tier = "shortlist"
+
+[[tiers.full.steps]]
+name = "resid"
+tier = "resid"
+
+[[tiers.full.steps]]
+name = "flat16"
+tier = "flat16"
+
+[[tiers.full.steps]]
+name = "flat16-rest"
+tier = "flat16-rest"
+
+[[tiers.full.steps]]
+name = "systems16"
+tier = "systems16"
+
+[[tiers.full.steps]]
+name = "flat1m"
+tier = "flat1m"
+
+[[tiers.full.steps]]
+name = "faiss-ivfpq-qps"
+experiment = "systems-faiss-sift1m"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["python3", "scripts/faiss_ivfpq_qps.py"]
+
+[[tiers.full.steps]]
+name = "scann-qps"
+experiment = "systems-scann-sift1m"
+seed = 42
+datasets = ["data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs"]
+argv = ["python3", "scripts/scann_qps.py", "--seed", "42", "--verify-determinism"]
+
+[tiers.prepare]
+description = "Verify public inputs and pinned baselines, then generate official RaBitQ outputs"
+required_distributions = ["faiss-cpu==1.14.2", "scann==1.4.2"]
+required_files = [
+  "requirements.txt",
+  "data/source/sift-128-euclidean.hdf5",
+  "data/source/gist-960-euclidean.hdf5",
+  "data/source/glove-25-angular.hdf5",
+  "data/source/train-00000-of-00026-3c7b99d1c7eda36e.parquet",
+  "data/source/train-00001-of-00026-2b24035a6390fdcb.parquet",
+  "data/source/train-00002-of-00026-b05ce48965853dad.parquet",
+  "data/baselines/RaBitQ-Library/LICENSE",
+  "data/wheelhouse/faiss_cpu-1.14.2-cp310-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+  "data/wheelhouse/scann-1.4.2-cp312-cp312-manylinux_2_27_x86_64.whl",
+]
+
+[[tiers.prepare.steps]]
+name = "verify-public-data"
+argv = ["python3", "scripts/verify_public_data.py"]
+
+[[tiers.prepare.steps]]
+name = "verify-baselines"
+argv = ["python3", "scripts/verify_baselines.py"]
+
+[[tiers.prepare.steps]]
+name = "official-rabitq-preparation"
+experiment = "official-rabitq-preparation"
+seed = 42
+datasets = [
+  "data/sift/sift_base.fvecs", "data/sift/sift_query.fvecs",
+  "data/erab/base.fvecs", "data/erab/query.fvecs", "data/erab/gold.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b1.ivecs", "data/erab/ivfA/erabIVF_n1_b2.ivecs",
+  "data/erab/ivfA/erabIVF_n1_b3.ivecs", "data/erab/ivfA/erabIVF_n1_b4.ivecs",
+]
+argv = ["python3", "scripts/prepare_official_rabitq.py"]

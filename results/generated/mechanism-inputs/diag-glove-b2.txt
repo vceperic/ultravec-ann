@@ -1,0 +1,19 @@
+diag: glove_base — 59500 vectors, dim 32, bits 2, seed 42
+  external queries: 200 from data/glove/glove_query.fvecs
+# Estimator-variance diagnostic — glove_base
+
+- dim **32**, db **59500**, queries **100**, seed **42**
+- `g=⟨ō,o⟩` recon-to-truth cosine; `κ=√((1−g²)/g²)`; `σ_pred=κ/√(D−1)` (RaBitQ Thm-3.2 per-pair std); `σ_emp`=std(estimate−exact)
+
+| backend | bits | M | mean g | κ | σ_pred | σ_emp | bias | recon MSE |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 2 | 0 | 0.8821 | 0.5153 | 0.09255 | 0.06208 | -0.02310 | 0.11445 |
+| turboquant_residual | 2 | 0 | — | — | — | 0.09341 | -0.05849 | — |
+| rabitq | 2 | 0 | 0.9434 | 0.3490 | 0.06269 | 0.06138 | -0.00007 | 0.11326 |
+| trellis | 2 | 12 | 0.9763 | 0.2212 | 0.03973 | 0.03795 | +0.00043 | 0.04736 |
+| pvq | 2 | 0 | 0.9393 | 0.3612 | 0.06487 | 0.06405 | +0.00015 | 0.12138 |
+| eden | 2 | 0 | 0.9427 | 0.3513 | 0.06310 | 0.06118 | -0.00014 | 0.11460 |
+| blockquant | 2 | 0 | 0.9529 | 0.3169 | 0.05691 | 0.05479 | +0.00079 | 0.09418 |
+| e8 | 2 | 0 | 0.9562 | 0.3047 | 0.05472 | 0.05284 | +0.00005 | 0.08752 |
+
+→ wrote <scratch-directory>/diag-glove_base-m12-b2.md

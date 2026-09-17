@@ -1,0 +1,86 @@
+    Finished `release` profile [optimized] target(s) in 0.00s
+     Running `target/release/ultravec ivf --dataset data/sift/sift_base.fvecs --query-file data/sift/sift_query.fvecs --max 1000000 --query-max 200 --bits 2 --nlist 1024 --nprobe 1,2,4,8,16,32,64,128 --shortlist 128,256,512 --reps 3 --seed 42`
+ivf: sift_base — 1000000 db, dim 128, 200 queries, 2-bit, nlist 1024, nprobe [1, 2, 4, 8, 16, 32, 64, 128], reps 3, seed 42
+ivf: computing exact-cosine ground-truth (k=10) for 200 queries over 1000000 db…
+ivf: k-means coarse quantizer, nlist=1024 (seed 42)…
+ivf: 1023/1024 non-empty lists, mean 978, max 22772
+ivf: building turboquant_baseline index…
+ivf: built turboquant_baseline in 0.4s (40 bytes/vec, codes-only (RAM-compressed))
+ivf:   turboquant_baseline nprobe=1    R@10=0.1210 QPS=    15374
+ivf:   turboquant_baseline nprobe=2    R@10=0.1665 QPS=     8498
+ivf:   turboquant_baseline nprobe=4    R@10=0.1880 QPS=     5636
+ivf:   turboquant_baseline nprobe=8    R@10=0.2000 QPS=     3389
+ivf:   turboquant_baseline nprobe=16   R@10=0.1980 QPS=     2061
+ivf:   turboquant_baseline nprobe=32   R@10=0.1985 QPS=     1249
+ivf:   turboquant_baseline nprobe=64   R@10=0.1970 QPS=      818
+ivf:   turboquant_baseline nprobe=128  R@10=0.1965 QPS=      475
+ivf: building rabitq index…
+ivf: built rabitq in 1.4s (36 bytes/vec, codes-only (RAM-compressed))
+ivf:   rabitq nprobe=1    R@10=0.2145 QPS=    19906
+ivf:   rabitq nprobe=2    R@10=0.3090 QPS=    12071
+ivf:   rabitq nprobe=4    R@10=0.3725 QPS=     8193
+ivf:   rabitq nprobe=8    R@10=0.4285 QPS=     4825
+ivf:   rabitq nprobe=16   R@10=0.4445 QPS=     2925
+ivf:   rabitq nprobe=32   R@10=0.4510 QPS=     1758
+ivf:   rabitq nprobe=64   R@10=0.4490 QPS=     1052
+ivf:   rabitq nprobe=128  R@10=0.4485 QPS=      637
+ivf: building trellis_recon index…
+ivf: built trellis_recon in 66.3s (38 bytes/vec, fp32 recon cache (NOT RAM-compressed))
+ivf:   trellis_recon nprobe=1    R@10=0.2590 QPS=    19171
+ivf:   trellis_recon nprobe=2    R@10=0.3845 QPS=    10379
+ivf:   trellis_recon nprobe=4    R@10=0.4795 QPS=     6047
+ivf:   trellis_recon nprobe=8    R@10=0.5420 QPS=     3341
+ivf:   trellis_recon nprobe=16   R@10=0.5675 QPS=     1918
+ivf:   trellis_recon nprobe=32   R@10=0.5755 QPS=     1092
+ivf:   trellis_recon nprobe=64   R@10=0.5815 QPS=      636
+ivf:   trellis_recon nprobe=128  R@10=0.5810 QPS=      388
+ivf: building trellis_codes index…
+ivf: built trellis_codes in 64.6s (38 bytes/vec, codes-only (RAM-compressed))
+ivf:   trellis_codes nprobe=1    R@10=0.2590 QPS=    18754
+ivf:   trellis_codes nprobe=2    R@10=0.3845 QPS=    11179
+ivf:   trellis_codes nprobe=4    R@10=0.4795 QPS=     6695
+ivf:   trellis_codes nprobe=8    R@10=0.5420 QPS=     4288
+ivf:   trellis_codes nprobe=16   R@10=0.5675 QPS=     2640
+ivf:   trellis_codes nprobe=32   R@10=0.5755 QPS=     1570
+ivf:   trellis_codes nprobe=64   R@10=0.5815 QPS=      957
+ivf:   trellis_codes nprobe=128  R@10=0.5810 QPS=      572
+ivf: building pvq index…
+ivf: built pvq in 0.5s (37 bytes/vec, codes-only (RAM-compressed))
+ivf:   pvq nprobe=1    R@10=0.2205 QPS=    15351
+ivf:   pvq nprobe=2    R@10=0.3120 QPS=     8474
+ivf:   pvq nprobe=4    R@10=0.3735 QPS=     4957
+ivf:   pvq nprobe=8    R@10=0.4180 QPS=     2812
+ivf:   pvq nprobe=16   R@10=0.4335 QPS=     1607
+ivf:   pvq nprobe=32   R@10=0.4415 QPS=      905
+ivf:   pvq nprobe=64   R@10=0.4430 QPS=      557
+ivf:   pvq nprobe=128  R@10=0.4425 QPS=      331
+ivf: building trellis_shortlist_c128 index…
+ivf: built trellis_shortlist_c128 in 62.8s (54 bytes/vec, codes-only + 1-bit shortlist (RAM-compressed))
+ivf:   trellis_shortlist_c128 nprobe=1    R@10=0.2400 QPS=    23103
+ivf:   trellis_shortlist_c128 nprobe=2    R@10=0.3600 QPS=    14452
+ivf:   trellis_shortlist_c128 nprobe=4    R@10=0.4550 QPS=     9370
+ivf:   trellis_shortlist_c128 nprobe=8    R@10=0.5210 QPS=     5763
+ivf:   trellis_shortlist_c128 nprobe=16   R@10=0.5500 QPS=     3394
+ivf:   trellis_shortlist_c128 nprobe=32   R@10=0.5600 QPS=     2026
+ivf:   trellis_shortlist_c128 nprobe=64   R@10=0.5645 QPS=     1242
+ivf:   trellis_shortlist_c128 nprobe=128  R@10=0.5650 QPS=      722
+ivf: building trellis_shortlist_c256 index…
+ivf: built trellis_shortlist_c256 in 65.5s (54 bytes/vec, codes-only + 1-bit shortlist (RAM-compressed))
+ivf:   trellis_shortlist_c256 nprobe=1    R@10=0.2500 QPS=    22066
+ivf:   trellis_shortlist_c256 nprobe=2    R@10=0.3730 QPS=    14276
+ivf:   trellis_shortlist_c256 nprobe=4    R@10=0.4685 QPS=     9077
+ivf:   trellis_shortlist_c256 nprobe=8    R@10=0.5335 QPS=     5578
+ivf:   trellis_shortlist_c256 nprobe=16   R@10=0.5605 QPS=     3183
+ivf:   trellis_shortlist_c256 nprobe=32   R@10=0.5710 QPS=     1904
+ivf:   trellis_shortlist_c256 nprobe=64   R@10=0.5755 QPS=     1121
+ivf:   trellis_shortlist_c256 nprobe=128  R@10=0.5750 QPS=      648
+ivf: building trellis_shortlist_c512 index…
+ivf: built trellis_shortlist_c512 in 66.1s (54 bytes/vec, codes-only + 1-bit shortlist (RAM-compressed))
+ivf:   trellis_shortlist_c512 nprobe=1    R@10=0.2550 QPS=    20779
+ivf:   trellis_shortlist_c512 nprobe=2    R@10=0.3795 QPS=    12863
+ivf:   trellis_shortlist_c512 nprobe=4    R@10=0.4755 QPS=     8170
+ivf:   trellis_shortlist_c512 nprobe=8    R@10=0.5380 QPS=     4905
+ivf:   trellis_shortlist_c512 nprobe=16   R@10=0.5655 QPS=     2907
+ivf:   trellis_shortlist_c512 nprobe=32   R@10=0.5730 QPS=     1673
+ivf:   trellis_shortlist_c512 nprobe=64   R@10=0.5790 QPS=      989
+ivf:   trellis_shortlist_c512 nprobe=128  R@10=0.5785 QPS=      553

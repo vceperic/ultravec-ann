@@ -1,0 +1,14 @@
+Centering sample efficiency — normalized SIFT-128, 1000 queries, 2 bits, exact-cosine gold, 6 draws
+Pinned upstream E-RaBitQ on the same footing: 0.6285
+
+| K | R@10 | CI half | vs upstream pp | vs uncentered pp |
+|---|---|---|---|---|
+| 0 | 0.6202 | 0.0000 | -0.83 | +0.00 |
+| 8 | 0.6892 | 0.0123 | +6.07 | +6.90 |
+| 16 | 0.6985 | 0.0080 | +7.00 | +7.83 |
+| 32 | 0.7016 | 0.0025 | +7.31 | +8.14 |
+| 64 | 0.7031 | 0.0031 | +7.46 | +8.29 |
+| 256 | 0.7057 | 0.0029 | +7.72 | +8.55 |
+| full | 0.7057 | 0.0000 | +7.72 | +8.55 |
+
+DONE center_sample_efficiency

@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite the associated paper."
+title: "UltraVec: Trellis-Coded Quantization for Calibration-Free Low-Bit Vector Search — Artifact"
+type: software
+version: 0.1.0
+authors:
+  - given-names: "Vladimir"
+    family-names: "Čeperić"
+    affiliation: "University of Zagreb Faculty of Electrical Engineering and Computing"
+    email: "vladimir.ceperic@fer.hr"
+    orcid: "https://orcid.org/0000-0002-7059-2369"
+license: MIT
+license-url: "https://opensource.org/licenses/MIT"
+repository-code: "https://github.com/vceperic/ultravec-ann"
+abstract: "Pure-Rust, BLAS-free implementation of UltraVec, a calibration-free trellis-coded quantizer for low-bit approximate nearest-neighbor search, with its full reproduction harness and retained provenance bundles. Against seven data-oblivious comparators on SIFT, GIST and DBpedia-OpenAI, UltraVec has the highest mean flat MIPS Recall@10 in 11 of 12 corpus-rate cells with paired intervals excluding zero against every comparator, and the highest Recall@100 and lowest reconstruction error in all 12; no comparator separates above it in any cell. On a shared footing with the pinned upstream E-RaBitQ library it leads by 4 to 7 points at every rate on SIFT. The plain codec needs no training corpus and no calibration pass."
+keywords:
+  - approximate nearest neighbor search
+  - vector quantization
+  - trellis-coded quantization
+  - reproducibility
+# `message` above asks readers to cite the paper, so name it here rather than
+# leaving a citation tool to fall back on the software entry. Add the archival DOI
+# and `date-released` only after those records actually exist.
+preferred-citation:
+  type: article
+  title: "UltraVec: Trellis-Coded Quantization for Calibration-Free Low-Bit Vector Search"
+  authors:
+    - given-names: "Vladimir"
+      family-names: "Čeperić"
+      affiliation: "University of Zagreb Faculty of Electrical Engineering and Computing"
+      orcid: "https://orcid.org/0000-0002-7059-2369"
+  year: 2026

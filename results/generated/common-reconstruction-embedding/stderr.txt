@@ -1,0 +1,2 @@
+    Finished `release` profile [optimized] target(s) in 0.44s
+     Running `target/release/ultravec bench --dataset data/dbpedia/dbpedia_base.fvecs --query-file data/dbpedia/dbpedia_query.fvecs --query-max 1000 --max 100000 --bits 1,2,3,4 --metric ip --seed 42 --sota3 --per-query-out results/generated/common-reconstruction-embedding/per-query.csv`

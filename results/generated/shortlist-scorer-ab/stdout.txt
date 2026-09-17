@@ -1,0 +1,24 @@
+# Shortlist stage-1 scorer — SIFT-100k, 2-bit, nlist 100 (mean list 1000), centered, n_probe=8, 200 queries, seed 42
+
+Recall@10 after the trellis rerank, so both stages are included.
+
+Cells are Recall@10 / QPS.
+
+| scorer | residual-norm weight | C=128 | C=256 | C=512 |
+|---|---|---|---|---|
+| asym | on | 0.6455 / 10194 | 0.6555 / 9164 | 0.6570 / 7926 |
+| asym | off | 0.6395 / 10033 | 0.6520 / 9228 | 0.6565 / 7846 |
+| hamming | on | 0.5775 / 53692 | 0.6205 / 34135 | 0.6415 / 21001 |
+| hamming | off | 0.5720 / 53390 | 0.6185 / 34782 | 0.6400 / 20672 |
+
+| lever | C=128 | C=256 | C=512 |
+|---|---|---|---|
+| asymmetric minus symmetric (pp) | +6.80 | +3.50 | +1.55 |
+| residual-norm weight, asym (pp) | +0.60 | +0.35 | +0.05 |
+| residual-norm weight, symmetric (pp) | +0.55 | +0.20 | +0.15 |
+
+| lever | C=128 | C=256 | C=512 |
+|---|---|---|---|
+| asymmetric QPS relative to symmetric | 0.19x | 0.27x | 0.38x |
+
+DONE shortlist_scorer_ab

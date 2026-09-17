@@ -1,0 +1,92 @@
+Cold-start PQ width control — 200 queries, 2 bits/dim, 6 calibration draws
+Every arm emits the same bits per vector; only the factorization differs.
+
+=== SIFT-50k, transformed D=128
+
+--- 256 centroids/subspace, 32 subspaces (8-bit subquantizer); calibration-free trellis = 0.6360
+| K | PQ R@10 | 95% CI half | vs trellis pp | leader |
+|---|---|---|---|---|
+| 32 | 0.4765 | 0.0054 | -15.95 | UltraVec |
+| 64 | 0.5620 | 0.0059 | -7.40 | UltraVec |
+| 128 | 0.6252 | 0.0048 | -1.08 | UltraVec |
+| 256 | 0.6820 | 0.0097 | +4.60 | PQ |
+| 512 | 0.6988 | 0.0040 | +6.28 | PQ |
+| 1000 | 0.7028 | 0.0087 | +6.68 | PQ |
+| 2000 | 0.7087 | 0.0109 | +7.27 | PQ |
+| 5000 | 0.7198 | 0.0109 | +8.38 | PQ |
+| 20000 | 0.7178 | 0.0054 | +8.18 | PQ |
+| full | 0.7150 | 0.0000 | +7.90 | PQ |
+
+--- 16 centroids/subspace, 64 subspaces (4-bit subquantizer); calibration-free trellis = 0.6360
+| K | PQ R@10 | 95% CI half | vs trellis pp | leader |
+|---|---|---|---|---|
+| 32 | 0.6255 | 0.0054 | -1.05 | UltraVec |
+| 64 | 0.6480 | 0.0100 | +1.20 | PQ |
+| 128 | 0.6595 | 0.0091 | +2.35 | PQ |
+| 256 | 0.6722 | 0.0049 | +3.62 | PQ |
+| 512 | 0.6755 | 0.0104 | +3.95 | PQ |
+| 1000 | 0.6852 | 0.0098 | +4.92 | PQ |
+| 2000 | 0.6817 | 0.0039 | +4.57 | PQ |
+| 5000 | 0.6810 | 0.0079 | +4.50 | PQ |
+| 20000 | 0.6890 | 0.0052 | +5.30 | PQ |
+| full | 0.6930 | 0.0000 | +5.70 | PQ |
+
+--- 4 centroids/subspace, 128 subspaces (2-bit subquantizer); calibration-free trellis = 0.6360
+| K | PQ R@10 | 95% CI half | vs trellis pp | leader |
+|---|---|---|---|---|
+| 32 | 0.6348 | 0.0086 | -0.12 | UltraVec |
+| 64 | 0.6448 | 0.0113 | +0.88 | PQ |
+| 128 | 0.6543 | 0.0104 | +1.83 | PQ |
+| 256 | 0.6625 | 0.0093 | +2.65 | PQ |
+| 512 | 0.6765 | 0.0081 | +4.05 | PQ |
+| 1000 | 0.6735 | 0.0103 | +3.75 | PQ |
+| 2000 | 0.6715 | 0.0049 | +3.55 | PQ |
+| 5000 | 0.6750 | 0.0038 | +3.90 | PQ |
+| 20000 | 0.6697 | 0.0045 | +3.37 | PQ |
+| full | 0.6740 | 0.0000 | +3.80 | PQ |
+
+=== GloVe-59k, transformed D=32
+
+--- 256 centroids/subspace, 8 subspaces (8-bit subquantizer); calibration-free trellis = 0.6340
+| K | PQ R@10 | 95% CI half | vs trellis pp | leader |
+|---|---|---|---|---|
+| 32 | 0.2882 | 0.0111 | -34.58 | UltraVec |
+| 64 | 0.3745 | 0.0079 | -25.95 | UltraVec |
+| 128 | 0.4538 | 0.0102 | -18.02 | UltraVec |
+| 256 | 0.5207 | 0.0035 | -11.33 | UltraVec |
+| 512 | 0.5445 | 0.0098 | -8.95 | UltraVec |
+| 1000 | 0.5523 | 0.0072 | -8.17 | UltraVec |
+| 2000 | 0.5635 | 0.0056 | -7.05 | UltraVec |
+| 5000 | 0.5727 | 0.0070 | -6.13 | UltraVec |
+| 20000 | 0.5817 | 0.0113 | -5.23 | UltraVec |
+| full | 0.5680 | 0.0000 | -6.60 | UltraVec |
+
+--- 16 centroids/subspace, 16 subspaces (4-bit subquantizer); calibration-free trellis = 0.6340
+| K | PQ R@10 | 95% CI half | vs trellis pp | leader |
+|---|---|---|---|---|
+| 32 | 0.4737 | 0.0159 | -16.03 | UltraVec |
+| 64 | 0.4905 | 0.0069 | -14.35 | UltraVec |
+| 128 | 0.5203 | 0.0052 | -11.37 | UltraVec |
+| 256 | 0.5253 | 0.0103 | -10.87 | UltraVec |
+| 512 | 0.5353 | 0.0102 | -9.87 | UltraVec |
+| 1000 | 0.5408 | 0.0130 | -9.32 | UltraVec |
+| 2000 | 0.5523 | 0.0094 | -8.17 | UltraVec |
+| 5000 | 0.5510 | 0.0105 | -8.30 | UltraVec |
+| 20000 | 0.5472 | 0.0086 | -8.68 | UltraVec |
+| full | 0.5540 | 0.0000 | -8.00 | UltraVec |
+
+--- 4 centroids/subspace, 32 subspaces (2-bit subquantizer); calibration-free trellis = 0.6340
+| K | PQ R@10 | 95% CI half | vs trellis pp | leader |
+|---|---|---|---|---|
+| 32 | 0.4873 | 0.0116 | -14.67 | UltraVec |
+| 64 | 0.5030 | 0.0079 | -13.10 | UltraVec |
+| 128 | 0.5092 | 0.0023 | -12.48 | UltraVec |
+| 256 | 0.5163 | 0.0131 | -11.77 | UltraVec |
+| 512 | 0.5202 | 0.0128 | -11.38 | UltraVec |
+| 1000 | 0.5258 | 0.0103 | -10.82 | UltraVec |
+| 2000 | 0.5235 | 0.0044 | -11.05 | UltraVec |
+| 5000 | 0.5220 | 0.0061 | -11.20 | UltraVec |
+| 20000 | 0.5248 | 0.0055 | -10.92 | UltraVec |
+| full | 0.5220 | 0.0000 | -11.20 | UltraVec |
+
+DONE coldstart_pq_width

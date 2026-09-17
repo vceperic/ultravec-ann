@@ -1,0 +1,69 @@
+{
+  "artifact_commit": "62150a687356562ff1faa3649874d4dbc88870a9",
+  "artifact_computation_sha256": "ca3f934e51eeaa7573baf80729fe98ab1bb078896f6a9185c80a06971321fc43",
+  "artifact_dirty": false,
+  "artifact_tree": "23d4a3d24c4ff6587f97f324230cb23ddbb98d61",
+  "baseline_manifest_sha256": "af050feeaeb1d4685d64875be35e70272c651e8f689359a68bc0409fb67f6bb0",
+  "baseline_revisions": {
+    "faiss-cpu": {
+      "kind": "python-wheel",
+      "license": "MIT",
+      "version": "1.14.2",
+      "wheel_sha256": "ec4784d9a14973f2eead3a3480e6d14e74253b234e2c12717d4319f21dfadfcd"
+    },
+    "rabitq-library": {
+      "kind": "git",
+      "license": "Apache-2.0",
+      "reproducibility_patch": "official_harness/rabitq-fixed-rotation-seed.patch",
+      "reproducibility_patch_sha256": "6d136297fdc2d9c76e3829547c2a4829ed042a24adaa60a95570ad6b6ebcc63f",
+      "revision": "540242ea0a68926f1b827bf1f9add844f07a427b"
+    },
+    "scann": {
+      "kind": "python-wheel",
+      "license": "Apache-2.0",
+      "version": "1.4.2",
+      "wheel_sha256": "c0f45d810e629fdcdf8da546d1e25bde4664d27dcf5c3399aa335b4934a0734c"
+    }
+  },
+  "campaign_start_commit": "62150a687356562ff1faa3649874d4dbc88870a9",
+  "campaign_start_computation_sha256": "ca3f934e51eeaa7573baf80729fe98ab1bb078896f6a9185c80a06971321fc43",
+  "campaign_start_dirty": false,
+  "command": [
+    "python3",
+    "scripts/generate_mechanism_inputs.py"
+  ],
+  "completed_utc": "2026-07-27T19:08:44.898521+00:00",
+  "cpu": "AMD Ryzen 9 7950X 16-Core Processor",
+  "dataset_manifest_sha256": "e1c8a108a6587977f91f3c5cadfa45975373e4c8160c07b5086f83433ab7eae5",
+  "dataset_sha256": {
+    "data/gist/gist_base.fvecs": "73418110328f5aa522d9f6b0cd9115a6c515dc44e3c48420e506ddeddbdbdbc0",
+    "data/gist/gist_query.fvecs": "0d1d620049de12da455ed7201e97cbab372c4d54d0e6dedbc8c503f62c911299",
+    "data/glove/glove_base.fvecs": "d1354be05459f7b614ffc99139581387e7c5451a98e483d7c059cdd250ba0812",
+    "data/glove/glove_query.fvecs": "43a0e4ae4c25e84e5bfba879282e8a477c7a11a96cf2cc875ccedf97ae76bb1d",
+    "data/sift/sift_base.fvecs": "21f66e2975057b5728ba56de1c825bac4f4d89d596609ae985741c6242631816",
+    "data/sift/sift_query.fvecs": "f7fc9be140accdfd64116c2fa2365ecdb69b8f084970c6b0532db5ff79ac8fdc",
+    "data/siftsmall/siftsmall_base.fvecs": "1e90414a3254361aba48a0d58e461f7661fb135dabb3da985290e94de8f60fe0",
+    "data/siftsmall/siftsmall_query.fvecs": "095af38bda2741be721447ba97e9286fa918ece946be92a9ae133276eddc1a10",
+    "data/venv/bin/python": "1643dacd9feaedc58f3cc581e4d22577dfe25c09b10282936186ccf0f2e61118"
+  },
+  "dependency_bundle_sha256": {},
+  "derived_manifest_sha256": "0f760a3de665b2873fdb2dad22b1c279b420bee9c18f6469ccfbf4aa4502f1d2",
+  "experiment": "mechanism-inputs",
+  "python_lock_sha256": "c8ae68c9251badf8735c5dcad040402f5505295aa714a3d042695d91a971fbe9",
+  "rebased_from_commit": "80e7169bb09434bf9cb22ffa8fb41dc71d9fdebe",
+  "schema_version": 1,
+  "seed": 42,
+  "status": "passed",
+  "threads": {
+    "omp": "20",
+    "rayon": "20"
+  },
+  "toolchain": {
+    "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "python": "3.12.3",
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)"
+  },
+  "ultravec_env": {
+    "ULTRAVEC_TRELLIS_MEM": "12"
+  }
+}

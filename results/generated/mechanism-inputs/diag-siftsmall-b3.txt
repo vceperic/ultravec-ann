@@ -1,0 +1,18 @@
+diag: siftsmall_base — 10000 vectors, dim 128, bits 3, seed 42
+  external queries: 100 from data/siftsmall/siftsmall_query.fvecs
+# Estimator-variance diagnostic — siftsmall_base
+
+- dim **128**, db **10000**, queries **100**, seed **42**
+- `g=⟨ō,o⟩` recon-to-truth cosine; `κ=√((1−g²)/g²)`; `σ_pred=κ/√(D−1)` (RaBitQ Thm-3.2 per-pair std); `σ_emp`=std(estimate−exact)
+
+| backend | bits | M | mean g | κ | σ_pred | σ_emp | bias | recon MSE |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 3 | 0 | 0.9513 | 0.3118 | 0.02767 | 0.02317 | -0.02206 | 0.04011 |
+| turboquant_residual | 3 | 0 | — | — | — | 0.03756 | -0.05140 | — |
+| rabitq | 3 | 0 | 0.9789 | 0.2074 | 0.01841 | 0.01709 | -0.00169 | 0.04212 |
+| trellis | 3 | 12 | 0.9919 | 0.1281 | 0.01137 | 0.00994 | +0.00024 | 0.01623 |
+| pvq | 3 | 0 | 0.9861 | 0.1674 | 0.01485 | 0.01281 | -0.00087 | 0.02783 |
+| eden | 3 | 0 | 0.9800 | 0.2020 | 0.01792 | 0.01694 | -0.00156 | 0.04002 |
+| blockquant | 3 | 0 | 0.9864 | 0.1663 | 0.01475 | 0.01304 | -0.00011 | 0.02719 |
+
+→ wrote <scratch-directory>/diag-siftsmall_base-m12-b3.md

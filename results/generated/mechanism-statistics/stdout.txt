@@ -1,0 +1,56 @@
+# Mechanism re-establishment — statistics on 'recall follows g, not MSE'
+
+Corpora: gist, glove, sift, siftsmall (IP/cosine, 100k subset where applicable, seed 42, the oblivious 7-codec field per cell). 16 (corpus×bit) cells.
+
+## (1) Per-corpus×bit cross-codec collapse + collinearity
+
+| corpus | bits | n | ρ(g,R@10) | ρ(MSE,R@10) | ρ(g,MSE) |
+|---|---|---|---|---|---|
+| siftsmall | 1 | 7 | +0.164 | -0.636 | -0.636 |
+| siftsmall | 2 | 7 | +0.893 | -0.679 | -0.786 |
+| siftsmall | 3 | 6 | +0.943 | -0.829 | -0.943 |
+| siftsmall | 4 | 6 | +0.899 | -0.829 | -0.928 |
+| sift | 1 | 7 | +0.418 | -0.927 | -0.636 |
+| sift | 2 | 7 | +1.000 | -0.786 | -0.786 |
+| sift | 3 | 6 | +0.943 | -0.886 | -0.943 |
+| sift | 4 | 6 | +0.829 | -0.771 | -0.943 |
+| glove | 1 | 7 | +0.709 | -0.855 | -0.782 |
+| glove | 2 | 7 | +1.000 | -0.893 | -0.893 |
+| glove | 3 | 6 | +1.000 | -1.000 | -1.000 |
+| glove | 4 | 6 | +1.000 | -0.943 | -0.943 |
+| gist | 1 | 7 | +0.807 | -0.532 | -0.636 |
+| gist | 2 | 7 | +0.964 | -0.714 | -0.786 |
+| gist | 3 | 6 | +0.853 | -0.559 | -0.829 |
+| gist | 4 | 6 | +0.551 | -0.147 | -0.754 |
+
+## (2) Cross-corpus separability — pooled within-cell normalized ranks (N=104)
+
+- ρ(g,   R@10)            = +0.809   (within-cell, all corpora)
+- ρ(MSE, R@10)            = -0.751
+- ρ(g,   R@10 | MSE)      = +0.509   ← g's signal *beyond* MSE
+- ρ(MSE, R@10 | g)        = -0.256   ← MSE's signal *beyond* g
+- ρ(g,   MSE)             = -0.823   (collinearity)
+
+Observed |ρ(g·)|−|ρ(MSE·)| = +0.253;  within-cell permutation p(g strictly more) = 0.00005 (20,000 permutations; +1 correction)
+
+### Leave-one-corpus-out sensitivity of the partial association
+
+| excluded corpus | cells | N | ρ(g,R@10\|MSE) | ρ(MSE,R@10\|g) |
+|---|---|---|---|---|
+| none | 16 | 104 | +0.509 | -0.256 |
+| siftsmall | 12 | 78 | +0.585 | -0.204 |
+| sift | 12 | 78 | +0.560 | -0.153 |
+| glove | 12 | 78 | +0.499 | -0.210 |
+| gist | 12 | 78 | +0.359 | -0.472 |
+
+### Effective information behind the partial association
+
+- observations: 104; breaking MSE=2(1-g) by >1e-3: 16
+- identity-breaking codecs: turboquant_baseline
+- excluding turboquant_baseline: N=88, ρ(g,MSE)=-0.9985, ρ(g,R@10|MSE)=-0.116, ρ(MSE,R@10|g)=-0.196
+
+## (3) Estimator-axis control (same codebook ⇒ same g+MSE, change scale)
+
+- eden: unbiased g=0.9355 MSE=0.1291 bias=-0.0033 σ=0.0311 R@10=0.525; biased bias=-0.0552 σ=0.0399 R@10=0.484; ΔR@10=-0.041
+- rabitq: unbiased g=0.9351 MSE=0.1298 bias=-0.0034 σ=0.0307 R@10=0.521; biased bias=-0.0556 σ=0.0394 R@10=0.488; ΔR@10=-0.033
+- blockquant: unbiased g=0.9482 MSE=0.1036 bias=-0.0020 σ=0.0265 R@10=0.549; biased bias=-0.0440 σ=0.0318 R@10=0.512; ΔR@10=-0.037

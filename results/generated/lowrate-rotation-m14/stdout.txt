@@ -1,0 +1,21 @@
+Rotation-draw variability — 100k base, 1,000 queries, query seed 42, 5 rotation draws [42, 7, 13, 29, 101]
+Every codec shares the drawn rotation, so a draw moves the whole field together.
+Rates swept: GIST 1 bit
+
+--- GIST, 1 bit
+| codec | mean R@10 | min | max | spread pp |
+|---|---|---|---|---|
+| blockquant | 0.8746 | 0.8620 | 0.8920 | 3.00 |
+| e8 | 0.8788 | 0.8640 | 0.8840 | 2.00 |
+| eden | 0.8778 | 0.8730 | 0.8860 | 1.30 |
+| pvq | 0.8778 | 0.8680 | 0.8850 | 1.70 |
+| rabitq | 0.8780 | 0.8730 | 0.8870 | 1.40 |
+| trellis | 0.8884 | 0.8850 | 0.8930 | 0.80 |
+| turboquant_baseline | 0.8756 | 0.8680 | 0.8830 | 1.50 |
+
+=== margin summary ===
+| corpus | bits | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|---|
+| GIST | 1 | +0.30 | 0.35 | +0.10 | +0.70 | leads-every-draw |
+
+DONE rotation_seed_ci

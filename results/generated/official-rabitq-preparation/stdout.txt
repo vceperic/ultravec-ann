@@ -1,0 +1,201 @@
++ ./data/venv/bin/python scripts/verify_baselines.py
+verified 3 pinned official baselines
++ ./data/venv/bin/python scripts/erab_prep.py
+prep: normalized base (100000, 128) query (1000, 128) cosine gold top-10, one IVF cell -> ./data/erab
++ cmake -S ./data/baselines/RaBitQ-Library-reproducible -B ./data/baselines/RaBitQ-Library-reproducible-build -DCMAKE_BUILD_TYPE=Release
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: ./data/baselines/RaBitQ-Library-reproducible-build
++ cmake --build ./data/baselines/RaBitQ-Library-reproducible-build --target ivf_rabitq_indexing -j
+[ 90%] Built target rabitq_core
+[100%] Built target ivf_rabitq_indexing
++ c++ -std=c++17 -O3 -march=native -fopenmp -I ./data/baselines/RaBitQ-Library-reproducible/include ./official_harness/erab_ivf_query10.cpp ./data/baselines/RaBitQ-Library-reproducible-build/librabitq_core.a -lrt -o ./data/baselines/RaBitQ-Library-reproducible-build/erab_ivf_query10
++ ./data/baselines/RaBitQ-Library-reproducible/bin/ivf_rabitq_indexing ./data/erab/base.fvecs ./data/erab/ivfA/centroids_1.fvecs ./data/erab/ivfA/cids_1.ivecs 1 ./data/erab/ivfA/erabIVF_n1_b1.index ip false
+Metric Type: IP
+File ./data/erab/base.fvecs loaded
+Rows 100000 Cols 128
+File ./data/erab/ivfA/centroids_1.fvecs loaded
+Rows 1 Cols 128
+File ./data/erab/ivfA/cids_1.ivecs loaded
+Rows 100000 Cols 1
+data loaded
+	N: 100000
+	DIM: 128
+Start IVF construction...
+	Loading clustering information...
+Allocating memory for IVF...
+ivf constructed 
+Indexing time 0.000930587
++ ./data/baselines/RaBitQ-Library-reproducible-build/erab_ivf_query10 ./data/erab/ivfA/erabIVF_n1_b1.index ./data/erab/query.fvecs ./data/erab/ivfA/erabIVF_n1_b1.ivecs 1 10 false
+File ./data/erab/query.fvecs loaded
+Rows 1000 Cols 128
+Loading IVF...
+	Loading meta data...
+Allocating memory for IVF...
+Index loaded
++ ./data/baselines/RaBitQ-Library-reproducible/bin/ivf_rabitq_indexing ./data/erab/base.fvecs ./data/erab/ivfA/centroids_1.fvecs ./data/erab/ivfA/cids_1.ivecs 2 ./data/erab/ivfA/erabIVF_n1_b2.index ip false
+Metric Type: IP
+File ./data/erab/base.fvecs loaded
+Rows 100000 Cols 128
+File ./data/erab/ivfA/centroids_1.fvecs loaded
+Rows 1 Cols 128
+File ./data/erab/ivfA/cids_1.ivecs loaded
+Rows 100000 Cols 1
+data loaded
+	N: 100000
+	DIM: 128
+Start IVF construction...
+	Loading clustering information...
+Allocating memory for IVF...
+ivf constructed 
+Indexing time 0.0101233
++ ./data/baselines/RaBitQ-Library-reproducible-build/erab_ivf_query10 ./data/erab/ivfA/erabIVF_n1_b2.index ./data/erab/query.fvecs ./data/erab/ivfA/erabIVF_n1_b2.ivecs 1 10 false
+File ./data/erab/query.fvecs loaded
+Rows 1000 Cols 128
+Loading IVF...
+	Loading meta data...
+Allocating memory for IVF...
+Index loaded
++ ./data/baselines/RaBitQ-Library-reproducible/bin/ivf_rabitq_indexing ./data/erab/base.fvecs ./data/erab/ivfA/centroids_1.fvecs ./data/erab/ivfA/cids_1.ivecs 3 ./data/erab/ivfA/erabIVF_n1_b3.index ip false
+Metric Type: IP
+File ./data/erab/base.fvecs loaded
+Rows 100000 Cols 128
+File ./data/erab/ivfA/centroids_1.fvecs loaded
+Rows 1 Cols 128
+File ./data/erab/ivfA/cids_1.ivecs loaded
+Rows 100000 Cols 1
+data loaded
+	N: 100000
+	DIM: 128
+Start IVF construction...
+	Loading clustering information...
+Allocating memory for IVF...
+ivf constructed 
+Indexing time 0.0171699
++ ./data/baselines/RaBitQ-Library-reproducible-build/erab_ivf_query10 ./data/erab/ivfA/erabIVF_n1_b3.index ./data/erab/query.fvecs ./data/erab/ivfA/erabIVF_n1_b3.ivecs 1 10 false
+File ./data/erab/query.fvecs loaded
+Rows 1000 Cols 128
+Loading IVF...
+	Loading meta data...
+Allocating memory for IVF...
+Index loaded
++ ./data/baselines/RaBitQ-Library-reproducible/bin/ivf_rabitq_indexing ./data/erab/base.fvecs ./data/erab/ivfA/centroids_1.fvecs ./data/erab/ivfA/cids_1.ivecs 4 ./data/erab/ivfA/erabIVF_n1_b4.index ip false
+Metric Type: IP
+File ./data/erab/base.fvecs loaded
+Rows 100000 Cols 128
+File ./data/erab/ivfA/centroids_1.fvecs loaded
+Rows 1 Cols 128
+File ./data/erab/ivfA/cids_1.ivecs loaded
+Rows 100000 Cols 1
+data loaded
+	N: 100000
+	DIM: 128
+Start IVF construction...
+	Loading clustering information...
+Allocating memory for IVF...
+ivf constructed 
+Indexing time 0.0174874
++ ./data/baselines/RaBitQ-Library-reproducible-build/erab_ivf_query10 ./data/erab/ivfA/erabIVF_n1_b4.index ./data/erab/query.fvecs ./data/erab/ivfA/erabIVF_n1_b4.ivecs 1 10 false
+File ./data/erab/query.fvecs loaded
+Rows 1000 Cols 128
+Loading IVF...
+	Loading meta data...
+Allocating memory for IVF...
+Index loaded
++ ./data/baselines/RaBitQ-Library-reproducible/bin/ivf_rabitq_indexing ./data/erab/base.fvecs ./data/erab/ivfA/centroids_1.fvecs ./data/erab/ivfA/cids_1.ivecs 1 <temporary-directory>/erabIVF_n1_b1.index ip false
+Metric Type: IP
+File ./data/erab/base.fvecs loaded
+Rows 100000 Cols 128
+File ./data/erab/ivfA/centroids_1.fvecs loaded
+Rows 1 Cols 128
+File ./data/erab/ivfA/cids_1.ivecs loaded
+Rows 100000 Cols 1
+data loaded
+	N: 100000
+	DIM: 128
+Start IVF construction...
+	Loading clustering information...
+Allocating memory for IVF...
+ivf constructed 
+Indexing time 0.000902677
++ ./data/baselines/RaBitQ-Library-reproducible-build/erab_ivf_query10 <temporary-directory>/erabIVF_n1_b1.index ./data/erab/query.fvecs <temporary-directory>/erabIVF_n1_b1.ivecs 1 10 false
+File ./data/erab/query.fvecs loaded
+Rows 1000 Cols 128
+Loading IVF...
+	Loading meta data...
+Allocating memory for IVF...
+Index loaded
++ ./data/baselines/RaBitQ-Library-reproducible/bin/ivf_rabitq_indexing ./data/erab/base.fvecs ./data/erab/ivfA/centroids_1.fvecs ./data/erab/ivfA/cids_1.ivecs 2 <temporary-directory>/erabIVF_n1_b2.index ip false
+Metric Type: IP
+File ./data/erab/base.fvecs loaded
+Rows 100000 Cols 128
+File ./data/erab/ivfA/centroids_1.fvecs loaded
+Rows 1 Cols 128
+File ./data/erab/ivfA/cids_1.ivecs loaded
+Rows 100000 Cols 1
+data loaded
+	N: 100000
+	DIM: 128
+Start IVF construction...
+	Loading clustering information...
+Allocating memory for IVF...
+ivf constructed 
+Indexing time 0.0101466
++ ./data/baselines/RaBitQ-Library-reproducible-build/erab_ivf_query10 <temporary-directory>/erabIVF_n1_b2.index ./data/erab/query.fvecs <temporary-directory>/erabIVF_n1_b2.ivecs 1 10 false
+File ./data/erab/query.fvecs loaded
+Rows 1000 Cols 128
+Loading IVF...
+	Loading meta data...
+Allocating memory for IVF...
+Index loaded
++ ./data/baselines/RaBitQ-Library-reproducible/bin/ivf_rabitq_indexing ./data/erab/base.fvecs ./data/erab/ivfA/centroids_1.fvecs ./data/erab/ivfA/cids_1.ivecs 3 <temporary-directory>/erabIVF_n1_b3.index ip false
+Metric Type: IP
+File ./data/erab/base.fvecs loaded
+Rows 100000 Cols 128
+File ./data/erab/ivfA/centroids_1.fvecs loaded
+Rows 1 Cols 128
+File ./data/erab/ivfA/cids_1.ivecs loaded
+Rows 100000 Cols 1
+data loaded
+	N: 100000
+	DIM: 128
+Start IVF construction...
+	Loading clustering information...
+Allocating memory for IVF...
+ivf constructed 
+Indexing time 0.0171856
++ ./data/baselines/RaBitQ-Library-reproducible-build/erab_ivf_query10 <temporary-directory>/erabIVF_n1_b3.index ./data/erab/query.fvecs <temporary-directory>/erabIVF_n1_b3.ivecs 1 10 false
+File ./data/erab/query.fvecs loaded
+Rows 1000 Cols 128
+Loading IVF...
+	Loading meta data...
+Allocating memory for IVF...
+Index loaded
++ ./data/baselines/RaBitQ-Library-reproducible/bin/ivf_rabitq_indexing ./data/erab/base.fvecs ./data/erab/ivfA/centroids_1.fvecs ./data/erab/ivfA/cids_1.ivecs 4 <temporary-directory>/erabIVF_n1_b4.index ip false
+Metric Type: IP
+File ./data/erab/base.fvecs loaded
+Rows 100000 Cols 128
+File ./data/erab/ivfA/centroids_1.fvecs loaded
+Rows 1 Cols 128
+File ./data/erab/ivfA/cids_1.ivecs loaded
+Rows 100000 Cols 1
+data loaded
+	N: 100000
+	DIM: 128
+Start IVF construction...
+	Loading clustering information...
+Allocating memory for IVF...
+ivf constructed 
+Indexing time 0.0175499
++ ./data/baselines/RaBitQ-Library-reproducible-build/erab_ivf_query10 <temporary-directory>/erabIVF_n1_b4.index ./data/erab/query.fvecs <temporary-directory>/erabIVF_n1_b4.ivecs 1 10 false
+File ./data/erab/query.fvecs loaded
+Rows 1000 Cols 128
+Loading IVF...
+	Loading meta data...
+Allocating memory for IVF...
+Index loaded
+official RaBitQ 1-bit output verified twice: 540e3a8bf7f9ce6cefe1838bf474c6bfc78e2f57f43aad944caa301e6351d12d
+official RaBitQ 2-bit output verified twice: 67473ae56d7518a81f33f36c6a5bc66d22490248120c80b44fb2ec814070ca65
+official RaBitQ 3-bit output verified twice: 94d7d2260dd7f328d3db0c6adb8a33d7dff497b8f05c5db07efc4f0dbb803669
+official RaBitQ 4-bit output verified twice: 2fd859025db30e907caa82c0d4b6434ec16e5284891de981b3192178a3742b07
+prepared deterministic official RaBitQ IP top-10 outputs for 1--4 bits/dimension

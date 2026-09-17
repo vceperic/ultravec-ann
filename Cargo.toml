@@ -1,0 +1,27 @@
+[package]
+name = "ultravec"
+version = "0.1.0"
+edition = "2021"
+description = "UltraVec: calibration-free trellis-coded quantization for low-bit ANN search. Pure Rust, no BLAS, no training corpus."
+license = "MIT"
+publish = false
+
+[lib]
+name = "ultravec"
+path = "src/lib.rs"
+
+[[bin]]
+name = "ultravec"
+path = "src/main.rs"
+
+[dependencies]
+# Pure Rust, with no BLAS or statistics-library dependency. Numerical kernels
+# and experiment statistics used by the Rust harness are implemented in-crate.
+anyhow = "1"
+rayon = "1"   # data-parallel build loop (pure-Rust, BLAS-free — consistent with the no-BLAS rule)
+
+[profile.release]
+opt-level = 3
+
+# Keep the artifact independent when checked out on its own or nested in a larger tree.
+[workspace]

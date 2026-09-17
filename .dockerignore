@@ -1,0 +1,8 @@
+# Retained evidence stays in the image, but repository history does not. Portable
+# computation hashing and claim validation work from a plain source tree.
+.git
+target
+data
+.venv
+__pycache__
+*.pyc

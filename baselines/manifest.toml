@@ -1,0 +1,39 @@
+schema_version = 1
+
+[[baseline]]
+id = "rabitq-library"
+kind = "git"
+upstream = "https://github.com/VectorDB-NTU/RaBitQ-Library.git"
+revision = "540242ea0a68926f1b827bf1f9add844f07a427b"
+license = "Apache-2.0"
+license_file_sha256 = "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd"
+local_path = "data/baselines/RaBitQ-Library"
+reproducibility_patch = "official_harness/rabitq-fixed-rotation-seed.patch"
+reproducibility_patch_sha256 = "6d136297fdc2d9c76e3829547c2a4829ed042a24adaa60a95570ad6b6ebcc63f"
+reproducibility_patch_effect = "Replaces std::random_device with seed 42 for the FHT sign rotation; no quantization, indexing, scoring, or search logic is changed."
+notes = "Official C++ implementation. The artifact adds a top-10 output harness and applies the recorded one-line seed patch in an ignored detached worktree so independent runs use the same rotation."
+
+[[baseline]]
+id = "faiss-cpu"
+kind = "python-wheel"
+upstream = "https://github.com/facebookresearch/faiss"
+version = "1.14.2"
+source_tag = "v1.14.2"
+source_commit = "8f038486672564190a78307e4fb5ce2da6c43d45"
+distribution = "faiss-cpu==1.14.2"
+wheel = "faiss_cpu-1.14.2-cp310-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+wheel_sha256 = "ec4784d9a14973f2eead3a3480e6d14e74253b234e2c12717d4319f21dfadfcd"
+license = "MIT"
+local_path = "data/wheelhouse/faiss_cpu-1.14.2-cp310-abi3-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+
+[[baseline]]
+id = "scann"
+kind = "python-wheel"
+upstream = "https://github.com/google-research/google-research/tree/master/scann"
+version = "1.4.2"
+distribution = "scann==1.4.2"
+wheel = "scann-1.4.2-cp312-cp312-manylinux_2_27_x86_64.whl"
+wheel_sha256 = "c0f45d810e629fdcdf8da546d1e25bde4664d27dcf5c3399aa335b4934a0734c"
+license = "Apache-2.0"
+local_path = "data/wheelhouse/scann-1.4.2-cp312-cp312-manylinux_2_27_x86_64.whl"
+notes = "The immutable PyPI 1.4.2 wheel is the executable revision because the monorepo does not publish a matching source tag."
