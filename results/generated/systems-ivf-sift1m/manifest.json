@@ -1,0 +1,87 @@
+{
+  "artifact_commit": "30d652901d65f9585847a731acbb8c018d25114e",
+  "artifact_computation_sha256": "973ced317381b3608fd8e3e11da5a38faa83766e3eb817426fa349e4c0d2fc26",
+  "artifact_dirty": false,
+  "artifact_tree": "2b710aeaeb2769abe71ee4d7908166d65b293a4d",
+  "baseline_manifest_sha256": "af050feeaeb1d4685d64875be35e70272c651e8f689359a68bc0409fb67f6bb0",
+  "baseline_revisions": {
+    "faiss-cpu": {
+      "kind": "python-wheel",
+      "license": "MIT",
+      "version": "1.14.2",
+      "wheel_sha256": "ec4784d9a14973f2eead3a3480e6d14e74253b234e2c12717d4319f21dfadfcd"
+    },
+    "rabitq-library": {
+      "kind": "git",
+      "license": "Apache-2.0",
+      "reproducibility_patch": "official_harness/rabitq-fixed-rotation-seed.patch",
+      "reproducibility_patch_sha256": "6d136297fdc2d9c76e3829547c2a4829ed042a24adaa60a95570ad6b6ebcc63f",
+      "revision": "540242ea0a68926f1b827bf1f9add844f07a427b"
+    },
+    "scann": {
+      "kind": "python-wheel",
+      "license": "Apache-2.0",
+      "version": "1.4.2",
+      "wheel_sha256": "c0f45d810e629fdcdf8da546d1e25bde4664d27dcf5c3399aa335b4934a0734c"
+    }
+  },
+  "campaign_start_commit": "30d652901d65f9585847a731acbb8c018d25114e",
+  "campaign_start_computation_sha256": "973ced317381b3608fd8e3e11da5a38faa83766e3eb817426fa349e4c0d2fc26",
+  "campaign_start_dirty": false,
+  "command": [
+    "cargo",
+    "run",
+    "--locked",
+    "--release",
+    "--",
+    "ivf",
+    "--dataset",
+    "data/sift/sift_base.fvecs",
+    "--query-file",
+    "data/sift/sift_query.fvecs",
+    "--max",
+    "1000000",
+    "--query-max",
+    "200",
+    "--bits",
+    "2",
+    "--nlist",
+    "1024",
+    "--nprobe",
+    "1,2,4,8,16,32,64,128",
+    "--shortlist",
+    "128,256,512",
+    "--reps",
+    "3",
+    "--seed",
+    "42"
+  ],
+  "completed_utc": "2026-08-20T09:11:10.797752+00:00",
+  "cpu": "AMD Ryzen 9 7950X 16-Core Processor",
+  "dataset_manifest_sha256": "e1c8a108a6587977f91f3c5cadfa45975373e4c8160c07b5086f83433ab7eae5",
+  "dataset_sha256": {
+    "data/sift/sift_base.fvecs": "21f66e2975057b5728ba56de1c825bac4f4d89d596609ae985741c6242631816",
+    "data/sift/sift_query.fvecs": "f7fc9be140accdfd64116c2fa2365ecdb69b8f084970c6b0532db5ff79ac8fdc"
+  },
+  "dependency_bundle_sha256": {},
+  "derived_manifest_sha256": "0f760a3de665b2873fdb2dad22b1c279b420bee9c18f6469ccfbf4aa4502f1d2",
+  "experiment": "systems-ivf-sift1m",
+  "python_lock_sha256": "c8ae68c9251badf8735c5dcad040402f5505295aa714a3d042695d91a971fbe9",
+  "rebased_from_commit": "0e522c2c8b7db02ee2857e3793c6c59a29d5c7e3",
+  "schema_version": 1,
+  "seed": 42,
+  "status": "passed",
+  "threads": {
+    "omp": "20",
+    "rayon": "20"
+  },
+  "toolchain": {
+    "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "python": "3.12.3",
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)"
+  },
+  "ultravec_env": {
+    "ULTRAVEC_IVF_CENTER": "1",
+    "ULTRAVEC_TRELLIS_MEM": "12"
+  }
+}

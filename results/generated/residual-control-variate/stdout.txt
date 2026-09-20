@@ -1,0 +1,30 @@
+# Residual control variate on the trellis base — SIFT-100k, 1,000 queries, raw-IP gold, seed 42, M=12, uncentered
+
+Bit-matched by construction: the variant drops one bit per dimension from the base and spends it on the sketch. The 4-byte residual norm is extra and is reported, not hidden.
+
+## Bit-matched: one bit per dimension of base traded for the sketch
+
+| control bits | variant base bits | control B | variant B | dB | control R@10 | variant R@10 | delta pp |
+|---|---|---|---|---|---|---|---|
+| 2 | 1 | 42 | 46 | +4 | 0.6200 | 0.3440 | -27.60 |
+| 3 | 2 | 58 | 62 | +4 | 0.8000 | 0.6470 | -15.30 |
+| 4 | 3 | 74 | 78 | +4 | 0.8890 | 0.8120 | -7.70 |
+
+## Same base rate: what the correction is worth for its own bytes
+
+| bits | plain B | corrected B | dB | plain R@10 | corrected R@10 | delta pp |
+|---|---|---|---|---|---|---|
+| 1 | 26 | 46 | +20 | 0.3080 | 0.3440 | +3.60 |
+| 2 | 42 | 62 | +20 | 0.6200 | 0.6470 | +2.70 |
+| 3 | 58 | 78 | +20 | 0.8000 | 0.8120 | +1.20 |
+| 4 | 74 | 94 | +20 | 0.8890 | 0.8960 | +0.70 |
+
+| control bits | R@1 c/v | R@100 c/v |
+|---|---|---|
+| 2 | 0.5260 / 0.2580 | 0.7020 / 0.4590 |
+| 3 | 0.7080 / 0.5460 | 0.8490 / 0.7250 |
+| 4 | 0.8380 / 0.7240 | 0.9250 / 0.8610 |
+
+Bit-matched pairs above; the same-rate table pairs each rate with itself.
+
+DONE residual_control_variate

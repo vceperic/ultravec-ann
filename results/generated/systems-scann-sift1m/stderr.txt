@@ -1,0 +1,3 @@
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1785179541.999237 2481279 partitioner_factory_base.cc:58] Size of sampled dataset for training partition: 250000
+I0000 00:00:1785179566.988466 2481279 kmeans_tree_partitioner_utils.h:90] PartitionerFactory ran in 24.989197266s.

@@ -1,0 +1,21 @@
+Rotation-draw variability — 100k base, 1,000 queries, query seed 42, 5 rotation draws [42, 7, 13, 29, 101]
+Every codec shares the drawn rotation, so a draw moves the whole field together.
+Rates swept: DBpedia 1 bit
+
+--- DBpedia, 1 bit
+| codec | mean R@10 | min | max | spread pp |
+|---|---|---|---|---|
+| blockquant | 0.7382 | 0.7350 | 0.7430 | 0.80 |
+| e8 | 0.7394 | 0.7340 | 0.7420 | 0.80 |
+| eden | 0.7328 | 0.7280 | 0.7350 | 0.70 |
+| pvq | 0.7366 | 0.7320 | 0.7380 | 0.60 |
+| rabitq | 0.7328 | 0.7280 | 0.7350 | 0.70 |
+| trellis | 0.7564 | 0.7530 | 0.7610 | 0.80 |
+| turboquant_baseline | 0.7366 | 0.7330 | 0.7410 | 0.80 |
+
+=== margin summary ===
+| corpus | bits | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|---|
+| DBpedia | 1 | +1.54 | 0.52 | +1.20 | +2.20 | leads-every-draw |
+
+DONE rotation_seed_ci

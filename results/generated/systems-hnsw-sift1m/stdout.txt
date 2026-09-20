@@ -1,0 +1,41 @@
+# HNSW recall@10 vs QPS Pareto (codec drop-in) — sift_base
+
+- dim **128**, db **1000000**, queries **200**, graph **M=16**, ef_construction **200**, 2-bit, **20 threads**.
+- Pure-Rust, BLAS-free HNSW (Malkov & Yashunin 2018). A graph is rebuilt from each codec's reconstructed vectors, and the same reconstructions are resident during search. This is a controlled navigation study, not a codes-only production index. recall@10 is vs **exact cosine top-10** over the same database.
+- `code B/vec` is the serialized codec footprint. `resident B/vec` additionally includes the graph and the mandatory fp32 reconstruction cache used by this implementation. Recall--QPS comparisons must use the resident column.
+
+| codec | ef | recall@10 | QPS | code B/vec | resident B/vec | build s |
+|---|---|---|---|---|---|---|
+| fp32 | 16 | 0.7440 | 18345 | 512 | 734 | 510.1 |
+| fp32 | 32 | 0.8540 | 14095 | 512 | 734 | 510.1 |
+| fp32 | 64 | 0.9280 | 10827 | 512 | 734 | 510.1 |
+| fp32 | 128 | 0.9695 | 7708 | 512 | 734 | 510.1 |
+| fp32 | 256 | 0.9880 | 5501 | 512 | 734 | 510.1 |
+| trellis | 16 | 0.4720 | 17481 | 38 | 770 | 622.0 |
+| trellis | 32 | 0.5060 | 13386 | 38 | 770 | 622.0 |
+| trellis | 64 | 0.5315 | 9986 | 38 | 770 | 622.0 |
+| trellis | 128 | 0.5420 | 7471 | 38 | 770 | 622.0 |
+| trellis | 256 | 0.5425 | 5139 | 38 | 770 | 622.0 |
+| trellis_codes_only | 16 | 0.4715 | 22490 | 38 | 258 | 677.8 |
+| trellis_codes_only | 32 | 0.5055 | 18189 | 38 | 258 | 677.8 |
+| trellis_codes_only | 64 | 0.5255 | 14670 | 38 | 258 | 677.8 |
+| trellis_codes_only | 128 | 0.5430 | 10334 | 38 | 258 | 677.8 |
+| trellis_codes_only | 256 | 0.5415 | 7547 | 38 | 258 | 677.8 |
+| rabitq | 16 | 0.3895 | 16694 | 36 | 766 | 577.2 |
+| rabitq | 32 | 0.4210 | 13542 | 36 | 766 | 577.2 |
+| rabitq | 64 | 0.4440 | 10385 | 36 | 766 | 577.2 |
+| rabitq | 128 | 0.4555 | 7321 | 36 | 766 | 577.2 |
+| rabitq | 256 | 0.4615 | 5008 | 36 | 766 | 577.2 |
+| turboquant_baseline | 16 | 0.1370 | 17421 | 40 | 737 | 549.1 |
+| turboquant_baseline | 32 | 0.1630 | 13710 | 40 | 737 | 549.1 |
+| turboquant_baseline | 64 | 0.1785 | 9597 | 40 | 737 | 549.1 |
+| turboquant_baseline | 128 | 0.1865 | 7417 | 40 | 737 | 549.1 |
+| turboquant_baseline | 256 | 0.1905 | 5306 | 40 | 737 | 549.1 |
+
+## QPS at a fixed recall target (the fidelity codec reaches it at smaller ef → higher QPS)
+
+- **recall@10 >= 0.90:** fp32 10827 QPS @ ef 64 (512 B/vec) · trellis (target unreached) · trellis_codes_only (target unreached) · rabitq (target unreached) · turboquant_baseline (target unreached)
+- **recall@10 >= 0.95:** fp32 7708 QPS @ ef 128 (512 B/vec) · trellis (target unreached) · trellis_codes_only (target unreached) · rabitq (target unreached) · turboquant_baseline (target unreached)
+- **recall@10 >= 0.99:** fp32 (target unreached) · trellis (target unreached) · trellis_codes_only (target unreached) · rabitq (target unreached) · turboquant_baseline (target unreached)
+
+→ wrote ./results/hnsw-qps-pareto.md

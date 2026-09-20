@@ -1,0 +1,62 @@
+{
+  "artifact_commit": "7e4144551c06d7f9cca15e1728777297bf35fdff",
+  "artifact_computation_sha256": "1ccc83d20d49cb1ae8e7e9580d833641093b6fe32cbdaecde6c2134ba4c90f00",
+  "artifact_dirty": false,
+  "artifact_tree": "b1f060c864e93cbcd3072899b4ad67f430aa9155",
+  "baseline_manifest_sha256": "af050feeaeb1d4685d64875be35e70272c651e8f689359a68bc0409fb67f6bb0",
+  "baseline_revisions": {
+    "faiss-cpu": {
+      "kind": "python-wheel",
+      "license": "MIT",
+      "version": "1.14.2",
+      "wheel_sha256": "ec4784d9a14973f2eead3a3480e6d14e74253b234e2c12717d4319f21dfadfcd"
+    },
+    "rabitq-library": {
+      "kind": "git",
+      "license": "Apache-2.0",
+      "reproducibility_patch": "official_harness/rabitq-fixed-rotation-seed.patch",
+      "reproducibility_patch_sha256": "6d136297fdc2d9c76e3829547c2a4829ed042a24adaa60a95570ad6b6ebcc63f",
+      "revision": "540242ea0a68926f1b827bf1f9add844f07a427b"
+    },
+    "scann": {
+      "kind": "python-wheel",
+      "license": "Apache-2.0",
+      "version": "1.4.2",
+      "wheel_sha256": "c0f45d810e629fdcdf8da546d1e25bde4664d27dcf5c3399aa335b4934a0734c"
+    }
+  },
+  "campaign_start_commit": "7e4144551c06d7f9cca15e1728777297bf35fdff",
+  "campaign_start_computation_sha256": "1ccc83d20d49cb1ae8e7e9580d833641093b6fe32cbdaecde6c2134ba4c90f00",
+  "campaign_start_dirty": false,
+  "command": [
+    "python3",
+    "scripts/centering_granularity.py"
+  ],
+  "completed_utc": "2026-08-21T13:27:56.623673+00:00",
+  "cpu": "AMD Ryzen 9 7950X 16-Core Processor",
+  "dataset_manifest_sha256": "e1c8a108a6587977f91f3c5cadfa45975373e4c8160c07b5086f83433ab7eae5",
+  "dataset_sha256": {
+    "data/sift/sift_base.fvecs": "21f66e2975057b5728ba56de1c825bac4f4d89d596609ae985741c6242631816",
+    "data/sift/sift_query.fvecs": "f7fc9be140accdfd64116c2fa2365ecdb69b8f084970c6b0532db5ff79ac8fdc"
+  },
+  "dependency_bundle_sha256": {},
+  "derived_manifest_sha256": "0f760a3de665b2873fdb2dad22b1c279b420bee9c18f6469ccfbf4aa4502f1d2",
+  "experiment": "centering-granularity",
+  "python_lock_sha256": "c8ae68c9251badf8735c5dcad040402f5505295aa714a3d042695d91a971fbe9",
+  "rebased_from_commit": "ecead83e4298392e6771b16df7e22ecddddc62d7",
+  "schema_version": 1,
+  "seed": 42,
+  "status": "passed",
+  "threads": {
+    "omp": "20",
+    "rayon": "20"
+  },
+  "toolchain": {
+    "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "python": "3.12.3",
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)"
+  },
+  "ultravec_env": {
+    "ULTRAVEC_TRELLIS_MEM": "12"
+  }
+}

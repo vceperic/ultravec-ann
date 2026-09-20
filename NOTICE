@@ -1,0 +1,26 @@
+UltraVec ANN artifact
+Copyright 2026 Vladimir Čeperić
+
+All UltraVec implementation source and all artifact-specific scripts in this
+repository are original work owned solely by Vladimir Čeperić. Files moved here
+from his earlier UltraVec working trees remain his work; copying or moving them
+between his repositories did not change their ownership or licensing status. No
+third-party or copyleft source code was incorporated into the UltraVec
+implementation. Vladimir Čeperić releases this work under the repository's
+MIT license.
+
+The associated author-generated paper PDF at
+`paper/ultravec-ann-vldbj.pdf` is not software and is explicitly excluded from
+the MIT license. It remains copyright © 2026 Vladimir Čeperić, all rights
+reserved; see `paper/PAPER-LICENSE.md`.
+
+The reproduction workflow can fetch or invoke external items, but they are not
+part of the UltraVec implementation:
+
+* The optional comparison fetches VectorDB-NTU/RaBitQ-Library into an ignored data
+  directory at the pinned upstream commit in `baselines/manifest.toml`. It is an
+  independent Apache-2.0 baseline and is not incorporated into UltraVec source.
+* External packages remain separate dependencies under their own terms; exact
+  executable versions are recorded in the locks and baseline manifest.
+* Public datasets are inputs, not software source. Raw and derived datasets are
+  not redistributed.

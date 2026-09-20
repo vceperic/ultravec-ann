@@ -1,0 +1,28 @@
+Warm reference: batch-fitted PCA-head, plain and centered trellis vs Faiss OPQ/PQ | trellis M=12
+Shared fitted state is outside the byte column for every fitted arm: PQ/OPQ codebooks, the PCA-head projection, and the centered arm's single mean vector (4*dim bytes).
+
+=== GIST-960  (n=100000, dim=960, queries=1000, budget=480B) ===
+  method                              bytes       g     R@1    R@10   R@100
+  faiss-OPQ SKIP (M=480: OPQ~PQ at sub_dim 2)
+  faiss-PQ  (data-dep)                  480  0.9983  0.8510  0.8929  0.9316
+  trellis@4 (obl, no head)              518  0.9979  0.8600  0.9060  0.9348  (vs PQ: +1.3pp R@10)
+  trellis@4 centered (fitted mean)      518  0.9995  0.9390  0.9606  0.9744  (vs PQ: +6.8pp R@10)
+  PCA-head@budget (data-dep; r=64,b=3,450B)    450  0.9994  0.9020  0.9302  0.9535  (vs PQ: +3.7pp R@10)
+
+=== SIFT  (n=100000, dim=128, queries=1000, budget=64B) ===
+  method                              bytes       g     R@1    R@10   R@100
+  faiss-OPQ (data-dep, strong)           64  0.9981  0.8570  0.9017  0.9314  (vs PQ: -0.5pp R@10)
+  faiss-PQ  (data-dep)                   64  0.9990  0.8720  0.9069  0.9345
+  trellis@4 (obl, no head)               70  0.9979  0.8340  0.8912  0.9239  (vs PQ: -1.6pp R@10)
+  trellis@4 centered (fitted mean)       70  0.9988  0.8880  0.9124  0.9422  (vs PQ: +0.5pp R@10)
+  PCA-head@budget (data-dep; r=8,b=3,58B)     58  0.9980  0.8590  0.9073  0.9357  (vs PQ: +0.0pp R@10)
+
+=== dbpedia  (n=100000, dim=1536, queries=1000, budget=768B) ===
+  method                              bytes       g     R@1    R@10   R@100
+  faiss-OPQ SKIP (M=768: OPQ~PQ at sub_dim 2)
+  faiss-PQ  (data-dep)                  768  0.9986  0.9690  0.9684  0.9724
+  trellis@4 (obl, no head)             1030  0.9983  0.9580  0.9648  0.9723  (vs PQ: -0.4pp R@10)
+  trellis@4 centered (fitted mean)     1030  0.9995  0.9840  0.9827  0.9852  (vs PQ: +1.4pp R@10)
+  PCA-head@budget (data-dep; r=128,b=2,642B)    642  0.9971  0.9640  0.9578  0.9654  (vs PQ: -1.1pp R@10)
+
+DONE

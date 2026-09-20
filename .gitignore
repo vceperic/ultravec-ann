@@ -1,0 +1,61 @@
+# No trailing slash: the corpora are fetch-only and are often provided as a
+# SYMLINK to a shared copy rather than a real directory, and a `dir/` pattern
+# matches only real directories.
+/target
+/data
+/paper-data/
+!paper/ultravec-ann-vldbj.pdf
+
+# The paper's evidence is `results/generated/**` and nothing else. The binary
+# writes ten report shapes straight into `results/` by default (see `results_dir`
+# in src/main.rs) -- flat-*.md, ivf-*.md, hnsw-*.md, coldstart-*.md, diag-*.md and
+# friends, plus per-query CSVs. Those are machine-local runs, not evidence, and
+# leaving them unignored meant a `git add .` in a fresh clone would publish them
+# next to PAPER-MAP.md with nothing to tell a reader which is authoritative.
+# Ignore the shapes and whitelist the three curated documents instead.
+/results/*.md
+/results/*.csv
+!/results/PAPER-MAP.md
+!/results/README.md
+
+/.venv/
+/venv/
+/env/
+/.pytest_cache/
+/.mypy_cache/
+__pycache__/
+*.py[cod]
+*.prof
+*.tmp
+
+# Never ship credentials or local environment state.
+.env
+.env.*
+*.env
+.envrc
+.direnv/
+
+# Editor and OS droppings.
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Corpus and archive shapes, in case one is ever staged outside data/.
+*.fvecs
+*.ivecs
+*.bvecs
+*.hdf5
+*.npy
+*.parquet
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Diagnostics from a step that failed to reproduce its bundle. The retained
+# evidence is left untouched and these are written beside it for inspection.
+results/generated/*.failed/

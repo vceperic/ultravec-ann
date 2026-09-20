@@ -1,0 +1,23 @@
+loaded base (1000000, 128) from ./data/sift/sift_base.fvecs
+cluster A (train pool) n=485822  cluster B (deployed index) n=514178
+shift: mean |mu_A-mu_B|/std_B = 1.304  centroid-cosine(A,B) = 0.4086
+DB_B (513178, 128)  Q_B (1000, 128) (queries drawn from cluster B)
+
+--- cosine recall@10 under distribution shift (DB=cluster B, queries=cluster B) ---
+trellis @2-bit (oblivious)      : R@10 = 0.5820  (38 B/vec)
+PQ M16x8 (16 B/vec):
+    in-corpus   (train on B)        : R@10 = 0.6335  (16 B/vec)
+    transferred (train on A, off-dist): R@10 = 0.3705  (16 B/vec)
+    => transfer degradation          : +0.2630  (+41.5% rel)
+PQ M32x8 (32 B/vec):
+    in-corpus   (train on B)        : R@10 = 0.7682  (32 B/vec)
+    transferred (train on A, off-dist): R@10 = 0.5690  (32 B/vec)
+    => transfer degradation          : +0.1992  (+25.9% rel)
+
+=== SUMMARY ===
+shift_strength(mean|dmu|/stdB)=1.304  centroid_cos=0.4086  nA=485822 nB=514178 nq=1000 seed=42 mem=12 bits=2
+  trellis_2bit                               R@10=0.5820  (38 B/vec)
+  pq_incorpus_M16x8 (16 B/vec)               R@10=0.6335  (16 B/vec)
+  pq_transferred_M16x8 (16 B/vec)            R@10=0.3705  (16 B/vec)
+  pq_incorpus_M32x8 (32 B/vec)               R@10=0.7682  (32 B/vec)
+  pq_transferred_M32x8 (32 B/vec)            R@10=0.5690  (32 B/vec)

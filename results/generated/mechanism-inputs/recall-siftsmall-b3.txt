@@ -1,0 +1,48 @@
+bench: siftsmall_base — 10000 vectors, dim 128, bits [3], seed 42
+  IP metric, external queries: 100 from data/siftsmall/siftsmall_query.fvecs
+  evaluated queries: 100
+# Phase 2 benchmark — siftsmall_base-ip
+
+- dim **128**, db **10000**, queries **100**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 3 | 0.550 | 0.594 | 0.718 | 0.03989 | 2867.7 | 56 | 56 |
+| turboquant_residual | 3 | 0.430 | 0.512 | 0.652 | — | 4905.8 | 60 | 60 |
+| rabitq | 3 | 0.770 | 0.800 | 0.858 | 0.04191 | 3075.5 | 56 | 56 |
+| trellis | 3 | 0.850 | 0.860 | 0.907 | 0.01621 | 518.2 | 58 | 711 |
+| pvq | 3 | 0.780 | 0.809 | 0.877 | 0.02791 | 1024.2 | 57 | 57 |
+| eden | 3 | 0.720 | 0.796 | 0.855 | 0.03977 | 2906.4 | 56 | 56 |
+| blockquant | 3 | 0.790 | 0.826 | 0.880 | 0.02715 | 2186.7 | 56 | 62 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| turboquant_residual | 3 | -8.20 |
+| rabitq | 3 | +20.60 |
+| trellis | 3 | +26.60 |
+| pvq | 3 | +21.50 |
+| eden | 3 | +20.20 |
+| blockquant | 3 | +23.20 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 3 | +26.600 | [+23.700, +29.500] | lead |
+| turboquant_residual | 3 | +34.800 | [+31.400, +38.300] | lead |
+| rabitq | 3 | +6.000 | [+3.900, +8.100] | lead |
+| pvq | 3 | +5.100 | [+3.100, +7.100] | lead |
+| eden | 3 | +6.400 | [+4.100, +8.600] | lead |
+| blockquant | 3 | +3.400 | [+1.400, +5.400] | lead |
+
+**Gate 3 (siftsmall_base-ip):** PASS — ≥3pp recall@10 gain over baseline on this dataset.
+
+→ wrote <scratch-directory>/phase2-siftsmall_base-ip.md
+→ wrote <scratch-directory>/phase2-siftsmall_base-ip-per-query.csv
