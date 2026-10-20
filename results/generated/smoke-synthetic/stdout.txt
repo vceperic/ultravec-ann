@@ -1,0 +1,49 @@
+bench: base — 128 vectors, dim 32, bits [2], seed 42
+  external queries: 16 from data/smoke/query.fvecs
+  evaluated queries: 16
+# Flat codec benchmark — base
+
+- dim **32**, db **128**, queries **16**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 2 | 1.000 | 0.738 | 0.951 | 0.11078 | 11.9 | 16 | 60 |
+| turboquant_residual | 2 | 1.000 | 0.637 | 0.923 | — | 17.8 | 16 | 26 |
+| rabitq | 2 | 1.000 | 0.725 | 0.949 | 0.10967 | 11.8 | 12 | 64 |
+| trellis | 2 | 1.000 | 0.863 | 0.968 | 0.04712 | 6.3 | 14 | 466 |
+| pvq | 2 | 1.000 | 0.781 | 0.949 | 0.08709 | 6.9 | 13 | 89 |
+| eden | 2 | 1.000 | 0.738 | 0.949 | 0.11037 | 11.6 | 12 | 16 |
+| blockquant | 2 | 1.000 | 0.731 | 0.960 | 0.09229 | 10.9 | 12 | 48 |
+| e8 | 2 | 1.000 | 0.819 | 0.956 | 0.08137 | 9.9 | 12 | 16400 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| turboquant_residual | 2 | -10.00 |
+| rabitq | 2 | -1.25 |
+| trellis | 2 | +12.50 |
+| pvq | 2 | +4.38 |
+| eden | 2 | +0.00 |
+| blockquant | 2 | -0.62 |
+| e8 | 2 | +8.13 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 2 | +12.500 | [+5.000, +20.000] | lead |
+| turboquant_residual | 2 | +22.500 | [+15.000, +31.250] | lead |
+| rabitq | 2 | +13.750 | [+8.125, +20.000] | lead |
+| pvq | 2 | +8.125 | [+2.500, +13.750] | lead |
+| eden | 2 | +12.500 | [+5.625, +19.375] | lead |
+| blockquant | 2 | +13.125 | [+7.500, +18.750] | lead |
+| e8 | 2 | +4.375 | [-1.875, +10.625] | tied |
+
+**At least one ≥3pp recall@10 gain over the TurboQuant reference (base):** yes.
+
+→ wrote ./results/flat-base.md
+→ wrote results/generated/smoke-synthetic/per-query.csv

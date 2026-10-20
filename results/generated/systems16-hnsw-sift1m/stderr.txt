@@ -1,0 +1,34 @@
+    Finished `release` profile [optimized] target(s) in 1.68s
+     Running `target/release/ultravec hnsw --dataset data/sift/sift_base.fvecs --query-file data/sift/sift_query.fvecs --max 1000000 --query-max 200 --bits 2 --m 16 --ef-construction 200 --ef 16,32,64,128,256 --codecs fp32,trellis,trellis_codes_only,rabitq,baseline --reps 3 --seed 42`
+hnsw: sift_base — 1000000 db, dim 128, 200 queries, 2-bit, M 16, ef_construction 200, ef [16, 32, 64, 128, 256], reps 3, seed 42
+hnsw: exact-cosine GT for 200 queries over 1000000 db…
+hnsw: fp32 built in 514.4s (512 B/vec) — sweeping ef [16, 32, 64, 128, 256]
+hnsw:   fp32 ef=16   R@10=0.7440 QPS=    17798
+hnsw:   fp32 ef=32   R@10=0.8540 QPS=    13960
+hnsw:   fp32 ef=64   R@10=0.9280 QPS=    10621
+hnsw:   fp32 ef=128  R@10=0.9695 QPS=     7912
+hnsw:   fp32 ef=256  R@10=0.9880 QPS=     5660
+hnsw: trellis built in 2241.3s (38 B/vec) — sweeping ef [16, 32, 64, 128, 256]
+hnsw:   trellis ef=16   R@10=0.4680 QPS=    16332
+hnsw:   trellis ef=32   R@10=0.5035 QPS=    12991
+hnsw:   trellis ef=64   R@10=0.5240 QPS=     9937
+hnsw:   trellis ef=128  R@10=0.5345 QPS=     7231
+hnsw:   trellis ef=256  R@10=0.5425 QPS=     5220
+hnsw: trellis_codes_only built in 3753.9s (38 B/vec) — sweeping ef [16, 32, 64, 128, 256]
+hnsw:   trellis_codes_only ef=16   R@10=0.4755 QPS=    17157
+hnsw:   trellis_codes_only ef=32   R@10=0.5110 QPS=    14636
+hnsw:   trellis_codes_only ef=64   R@10=0.5225 QPS=    11342
+hnsw:   trellis_codes_only ef=128  R@10=0.5400 QPS=     8887
+hnsw:   trellis_codes_only ef=256  R@10=0.5470 QPS=     5944
+hnsw: rabitq built in 571.7s (36 B/vec) — sweeping ef [16, 32, 64, 128, 256]
+hnsw:   rabitq ef=16   R@10=0.3895 QPS=    17532
+hnsw:   rabitq ef=32   R@10=0.4210 QPS=    13750
+hnsw:   rabitq ef=64   R@10=0.4440 QPS=    10486
+hnsw:   rabitq ef=128  R@10=0.4555 QPS=     7401
+hnsw:   rabitq ef=256  R@10=0.4615 QPS=     5291
+hnsw: turboquant_baseline built in 544.2s (40 B/vec) — sweeping ef [16, 32, 64, 128, 256]
+hnsw:   turboquant_baseline ef=16   R@10=0.1370 QPS=    17396
+hnsw:   turboquant_baseline ef=32   R@10=0.1630 QPS=    12508
+hnsw:   turboquant_baseline ef=64   R@10=0.1785 QPS=     9374
+hnsw:   turboquant_baseline ef=128  R@10=0.1865 QPS=     6982
+hnsw:   turboquant_baseline ef=256  R@10=0.1905 QPS=     4790

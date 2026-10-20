@@ -1,0 +1,11 @@
+Trellis memory at one bit — normalized SIFT-128, 1000 queries, exact-cosine gold, uncentered
+record = 16 B payload + ceil(M/8) B start state + 4 B rescale
+
+| M | state B | record B | R@10 | vs M=12 pp |
+|---|---|---|---|---|
+| 8 | 1 | 21 | 0.2825 | -2.75 |
+| 12 | 2 | 22 | 0.3100 | +0.00 |
+| 14 | 2 | 22 | 0.3214 | +1.14 |
+| 16 | 2 | 22 | 0.3225 | +1.25 |
+
+DONE rate_memory_sweep

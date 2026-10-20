@@ -1,0 +1,99 @@
+# IVF recall@10 vs QPS Pareto — sift_base
+
+- dim **128**, db **1000000**, queries **200**, nlist **1024**, 2-bit, seed **42**, **20 threads** (rayon, queries fanned out)
+- recall@10 is measured against exact cosine top-10 ground truth over the same database; QPS is wall-clock over the full query set.
+- trellis is reported in both deployment modes: `trellis_recon` uses a decode-free fp32 reconstruction cache; `trellis_codes` performs per-candidate Viterbi-state decoding from the compact representation.
+
+## recall@10 vs QPS, per codec × nprobe
+
+| codec | regime | nprobe | recall@10 | QPS | mean µs/q | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|
+| turboquant_baseline | codes-only (RAM-compressed) | 1 | 0.1210 | 15374 | 65.0 | 40 | 82 |
+| turboquant_baseline | codes-only (RAM-compressed) | 2 | 0.1665 | 8498 | 117.7 | 40 | 82 |
+| turboquant_baseline | codes-only (RAM-compressed) | 4 | 0.1880 | 5636 | 177.4 | 40 | 82 |
+| turboquant_baseline | codes-only (RAM-compressed) | 8 | 0.2000 | 3389 | 295.0 | 40 | 82 |
+| turboquant_baseline | codes-only (RAM-compressed) | 16 | 0.1980 | 2061 | 485.2 | 40 | 82 |
+| turboquant_baseline | codes-only (RAM-compressed) | 32 | 0.1985 | 1249 | 800.4 | 40 | 82 |
+| turboquant_baseline | codes-only (RAM-compressed) | 64 | 0.1970 | 818 | 1222.8 | 40 | 82 |
+| turboquant_baseline | codes-only (RAM-compressed) | 128 | 0.1965 | 475 | 2105.7 | 40 | 82 |
+| rabitq | codes-only (RAM-compressed) | 1 | 0.2145 | 19906 | 50.2 | 36 | 86 |
+| rabitq | codes-only (RAM-compressed) | 2 | 0.3090 | 12071 | 82.8 | 36 | 86 |
+| rabitq | codes-only (RAM-compressed) | 4 | 0.3725 | 8193 | 122.0 | 36 | 86 |
+| rabitq | codes-only (RAM-compressed) | 8 | 0.4285 | 4825 | 207.3 | 36 | 86 |
+| rabitq | codes-only (RAM-compressed) | 16 | 0.4445 | 2925 | 341.9 | 36 | 86 |
+| rabitq | codes-only (RAM-compressed) | 32 | 0.4510 | 1758 | 568.7 | 36 | 86 |
+| rabitq | codes-only (RAM-compressed) | 64 | 0.4490 | 1052 | 950.5 | 36 | 86 |
+| rabitq | codes-only (RAM-compressed) | 128 | 0.4485 | 637 | 1570.8 | 36 | 86 |
+| trellis_recon | fp32 recon cache (NOT RAM-compressed) | 1 | 0.2590 | 19171 | 52.2 | 38 | 616 |
+| trellis_recon | fp32 recon cache (NOT RAM-compressed) | 2 | 0.3845 | 10379 | 96.3 | 38 | 616 |
+| trellis_recon | fp32 recon cache (NOT RAM-compressed) | 4 | 0.4795 | 6047 | 165.4 | 38 | 616 |
+| trellis_recon | fp32 recon cache (NOT RAM-compressed) | 8 | 0.5420 | 3341 | 299.3 | 38 | 616 |
+| trellis_recon | fp32 recon cache (NOT RAM-compressed) | 16 | 0.5675 | 1918 | 521.3 | 38 | 616 |
+| trellis_recon | fp32 recon cache (NOT RAM-compressed) | 32 | 0.5755 | 1092 | 915.6 | 38 | 616 |
+| trellis_recon | fp32 recon cache (NOT RAM-compressed) | 64 | 0.5815 | 636 | 1572.9 | 38 | 616 |
+| trellis_recon | fp32 recon cache (NOT RAM-compressed) | 128 | 0.5810 | 388 | 2577.0 | 38 | 616 |
+| trellis_codes | codes-only (RAM-compressed) | 1 | 0.2590 | 18754 | 53.3 | 38 | 104 |
+| trellis_codes | codes-only (RAM-compressed) | 2 | 0.3845 | 11179 | 89.5 | 38 | 104 |
+| trellis_codes | codes-only (RAM-compressed) | 4 | 0.4795 | 6695 | 149.4 | 38 | 104 |
+| trellis_codes | codes-only (RAM-compressed) | 8 | 0.5420 | 4288 | 233.2 | 38 | 104 |
+| trellis_codes | codes-only (RAM-compressed) | 16 | 0.5675 | 2640 | 378.7 | 38 | 104 |
+| trellis_codes | codes-only (RAM-compressed) | 32 | 0.5755 | 1570 | 636.8 | 38 | 104 |
+| trellis_codes | codes-only (RAM-compressed) | 64 | 0.5815 | 957 | 1044.8 | 38 | 104 |
+| trellis_codes | codes-only (RAM-compressed) | 128 | 0.5810 | 572 | 1749.3 | 38 | 104 |
+| pvq | codes-only (RAM-compressed) | 1 | 0.2205 | 15351 | 65.1 | 37 | 111 |
+| pvq | codes-only (RAM-compressed) | 2 | 0.3120 | 8474 | 118.0 | 37 | 111 |
+| pvq | codes-only (RAM-compressed) | 4 | 0.3735 | 4957 | 201.7 | 37 | 111 |
+| pvq | codes-only (RAM-compressed) | 8 | 0.4180 | 2812 | 355.6 | 37 | 111 |
+| pvq | codes-only (RAM-compressed) | 16 | 0.4335 | 1607 | 622.4 | 37 | 111 |
+| pvq | codes-only (RAM-compressed) | 32 | 0.4415 | 905 | 1105.1 | 37 | 111 |
+| pvq | codes-only (RAM-compressed) | 64 | 0.4430 | 557 | 1796.2 | 37 | 111 |
+| pvq | codes-only (RAM-compressed) | 128 | 0.4425 | 331 | 3020.2 | 37 | 111 |
+| trellis_shortlist_c128 | codes-only + 1-bit shortlist (RAM-compressed) | 1 | 0.2400 | 23103 | 43.3 | 54 | 120 |
+| trellis_shortlist_c128 | codes-only + 1-bit shortlist (RAM-compressed) | 2 | 0.3600 | 14452 | 69.2 | 54 | 120 |
+| trellis_shortlist_c128 | codes-only + 1-bit shortlist (RAM-compressed) | 4 | 0.4550 | 9370 | 106.7 | 54 | 120 |
+| trellis_shortlist_c128 | codes-only + 1-bit shortlist (RAM-compressed) | 8 | 0.5210 | 5763 | 173.5 | 54 | 120 |
+| trellis_shortlist_c128 | codes-only + 1-bit shortlist (RAM-compressed) | 16 | 0.5500 | 3394 | 294.7 | 54 | 120 |
+| trellis_shortlist_c128 | codes-only + 1-bit shortlist (RAM-compressed) | 32 | 0.5600 | 2026 | 493.5 | 54 | 120 |
+| trellis_shortlist_c128 | codes-only + 1-bit shortlist (RAM-compressed) | 64 | 0.5645 | 1242 | 805.2 | 54 | 120 |
+| trellis_shortlist_c128 | codes-only + 1-bit shortlist (RAM-compressed) | 128 | 0.5650 | 722 | 1385.8 | 54 | 120 |
+| trellis_shortlist_c256 | codes-only + 1-bit shortlist (RAM-compressed) | 1 | 0.2500 | 22066 | 45.3 | 54 | 120 |
+| trellis_shortlist_c256 | codes-only + 1-bit shortlist (RAM-compressed) | 2 | 0.3730 | 14276 | 70.0 | 54 | 120 |
+| trellis_shortlist_c256 | codes-only + 1-bit shortlist (RAM-compressed) | 4 | 0.4685 | 9077 | 110.2 | 54 | 120 |
+| trellis_shortlist_c256 | codes-only + 1-bit shortlist (RAM-compressed) | 8 | 0.5335 | 5578 | 179.3 | 54 | 120 |
+| trellis_shortlist_c256 | codes-only + 1-bit shortlist (RAM-compressed) | 16 | 0.5605 | 3183 | 314.1 | 54 | 120 |
+| trellis_shortlist_c256 | codes-only + 1-bit shortlist (RAM-compressed) | 32 | 0.5710 | 1904 | 525.1 | 54 | 120 |
+| trellis_shortlist_c256 | codes-only + 1-bit shortlist (RAM-compressed) | 64 | 0.5755 | 1121 | 891.9 | 54 | 120 |
+| trellis_shortlist_c256 | codes-only + 1-bit shortlist (RAM-compressed) | 128 | 0.5750 | 648 | 1544.3 | 54 | 120 |
+| trellis_shortlist_c512 | codes-only + 1-bit shortlist (RAM-compressed) | 1 | 0.2550 | 20779 | 48.1 | 54 | 120 |
+| trellis_shortlist_c512 | codes-only + 1-bit shortlist (RAM-compressed) | 2 | 0.3795 | 12863 | 77.7 | 54 | 120 |
+| trellis_shortlist_c512 | codes-only + 1-bit shortlist (RAM-compressed) | 4 | 0.4755 | 8170 | 122.4 | 54 | 120 |
+| trellis_shortlist_c512 | codes-only + 1-bit shortlist (RAM-compressed) | 8 | 0.5380 | 4905 | 203.9 | 54 | 120 |
+| trellis_shortlist_c512 | codes-only + 1-bit shortlist (RAM-compressed) | 16 | 0.5655 | 2907 | 344.0 | 54 | 120 |
+| trellis_shortlist_c512 | codes-only + 1-bit shortlist (RAM-compressed) | 32 | 0.5730 | 1673 | 597.6 | 54 | 120 |
+| trellis_shortlist_c512 | codes-only + 1-bit shortlist (RAM-compressed) | 64 | 0.5790 | 989 | 1011.1 | 54 | 120 |
+| trellis_shortlist_c512 | codes-only + 1-bit shortlist (RAM-compressed) | 128 | 0.5785 | 553 | 1808.6 | 54 | 120 |
+
+## QPS at a recall@10 target (highest QPS among nprobes that reach it)
+
+Targets include the standard systems-paper thresholds reached here plus data-derived ones (fractions of the max achieved recall@10 = 0.582).
+
+| codec | R@10≥0.52 | R@10≥0.55 | R@10≥0.58 |
+|---|---|---|---|
+| turboquant_baseline | — | — | — |
+| rabitq | — | — | — |
+| trellis_recon | 3341 | 1918 | 636 |
+| trellis_codes | 4288 | 2640 | 957 |
+| pvq | — | — | — |
+| trellis_shortlist_c128 | 3394 | 2026 | — |
+| trellis_shortlist_c256 | 5578 | 3183 | — |
+| trellis_shortlist_c512 | 4905 | 2907 | 989 |
+
+## Pareto winner per recall@10 target (max QPS across all codecs)
+
+| R@10 target | winning codec | QPS | nprobe |
+|---|---|---|---|
+| ≥0.52 | trellis_shortlist_c256 (codes-only + 1-bit shortlist (RAM-compressed)) | 5578 | 8 |
+| ≥0.55 | trellis_shortlist_c256 (codes-only + 1-bit shortlist (RAM-compressed)) | 3183 | 16 |
+| ≥0.58 | trellis_shortlist_c512 (codes-only + 1-bit shortlist (RAM-compressed)) | 989 | 64 |
+
+→ wrote ./results/ivf-qps-pareto.md

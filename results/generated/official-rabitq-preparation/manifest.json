@@ -1,0 +1,70 @@
+{
+  "artifact_commit": "62150a687356562ff1faa3649874d4dbc88870a9",
+  "artifact_computation_sha256": "ca3f934e51eeaa7573baf80729fe98ab1bb078896f6a9185c80a06971321fc43",
+  "artifact_dirty": false,
+  "artifact_tree": "23d4a3d24c4ff6587f97f324230cb23ddbb98d61",
+  "baseline_manifest_sha256": "af050feeaeb1d4685d64875be35e70272c651e8f689359a68bc0409fb67f6bb0",
+  "baseline_revisions": {
+    "faiss-cpu": {
+      "kind": "python-wheel",
+      "license": "MIT",
+      "version": "1.14.2",
+      "wheel_sha256": "ec4784d9a14973f2eead3a3480e6d14e74253b234e2c12717d4319f21dfadfcd"
+    },
+    "rabitq-library": {
+      "kind": "git",
+      "license": "Apache-2.0",
+      "reproducibility_patch": "official_harness/rabitq-fixed-rotation-seed.patch",
+      "reproducibility_patch_sha256": "6d136297fdc2d9c76e3829547c2a4829ed042a24adaa60a95570ad6b6ebcc63f",
+      "revision": "540242ea0a68926f1b827bf1f9add844f07a427b"
+    },
+    "scann": {
+      "kind": "python-wheel",
+      "license": "Apache-2.0",
+      "version": "1.4.2",
+      "wheel_sha256": "c0f45d810e629fdcdf8da546d1e25bde4664d27dcf5c3399aa335b4934a0734c"
+    }
+  },
+  "campaign_start_commit": "62150a687356562ff1faa3649874d4dbc88870a9",
+  "campaign_start_computation_sha256": "ca3f934e51eeaa7573baf80729fe98ab1bb078896f6a9185c80a06971321fc43",
+  "campaign_start_dirty": false,
+  "command": [
+    "python3",
+    "scripts/prepare_official_rabitq.py"
+  ],
+  "completed_utc": "2026-07-27T12:09:14.448359+00:00",
+  "cpu": "AMD Ryzen 9 7950X 16-Core Processor",
+  "dataset_manifest_sha256": "e1c8a108a6587977f91f3c5cadfa45975373e4c8160c07b5086f83433ab7eae5",
+  "dataset_sha256": {
+    "data/erab/base.fvecs": "7a5ce1d237d72aef26a306b299b2150e59261020700d3d5834f33ad83e9991f6",
+    "data/erab/gold.ivecs": "fd20d482f053795d67f857d33e892a29c714948ee81a29408417a0a64325bda1",
+    "data/erab/ivfA/erabIVF_n1_b1.ivecs": "540e3a8bf7f9ce6cefe1838bf474c6bfc78e2f57f43aad944caa301e6351d12d",
+    "data/erab/ivfA/erabIVF_n1_b2.ivecs": "67473ae56d7518a81f33f36c6a5bc66d22490248120c80b44fb2ec814070ca65",
+    "data/erab/ivfA/erabIVF_n1_b3.ivecs": "94d7d2260dd7f328d3db0c6adb8a33d7dff497b8f05c5db07efc4f0dbb803669",
+    "data/erab/ivfA/erabIVF_n1_b4.ivecs": "2fd859025db30e907caa82c0d4b6434ec16e5284891de981b3192178a3742b07",
+    "data/erab/query.fvecs": "ac2fe1d3446c93a380d988bd4a816abfd1e77bdeae78c146f91835adfe50bae3",
+    "data/sift/sift_base.fvecs": "21f66e2975057b5728ba56de1c825bac4f4d89d596609ae985741c6242631816",
+    "data/sift/sift_query.fvecs": "f7fc9be140accdfd64116c2fa2365ecdb69b8f084970c6b0532db5ff79ac8fdc",
+    "data/venv/bin/python": "1643dacd9feaedc58f3cc581e4d22577dfe25c09b10282936186ccf0f2e61118"
+  },
+  "dependency_bundle_sha256": {},
+  "derived_manifest_sha256": "0f760a3de665b2873fdb2dad22b1c279b420bee9c18f6469ccfbf4aa4502f1d2",
+  "experiment": "official-rabitq-preparation",
+  "python_lock_sha256": "c8ae68c9251badf8735c5dcad040402f5505295aa714a3d042695d91a971fbe9",
+  "rebased_from_commit": "80e7169bb09434bf9cb22ffa8fb41dc71d9fdebe",
+  "schema_version": 1,
+  "seed": 42,
+  "status": "passed",
+  "threads": {
+    "omp": "20",
+    "rayon": "20"
+  },
+  "toolchain": {
+    "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "python": "3.12.3",
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)"
+  },
+  "ultravec_env": {
+    "ULTRAVEC_TRELLIS_MEM": "12"
+  }
+}

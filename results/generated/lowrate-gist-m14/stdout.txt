@@ -1,0 +1,48 @@
+bench: gist_base — 100000 vectors, dim 1024, bits [1], seed 42
+  IP metric, external queries: 1000 from data/gist/gist_query.fvecs
+  evaluated queries: 1000
+# Flat codec benchmark — gist_base-ip
+
+- dim **1024**, db **100000**, queries **1000**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 1 | 0.971 | 0.870 | 0.889 | 0.36814 | 191342.0 | 136 | 176 |
+| rabitq | 1 | 0.974 | 0.874 | 0.889 | 0.41021 | 131182.9 | 136 | 184 |
+| trellis | 1 | 0.994 | 0.889 | 0.902 | 0.28650 | 68673.7 | 138 | 4298 |
+| pvq | 1 | 0.987 | 0.872 | 0.889 | 0.38230 | 31013.9 | 138 | 210 |
+| eden | 1 | 0.974 | 0.874 | 0.889 | 0.41021 | 184061.1 | 136 | 136 |
+| blockquant | 1 | 0.979 | 0.862 | 0.892 | 0.38528 | 115140.5 | 136 | 136 |
+| e8 | 1 | 0.964 | 0.884 | 0.894 | 0.35070 | 89307.6 | 136 | 136 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| rabitq | 1 | +0.43 |
+| trellis | 1 | +1.92 |
+| pvq | 1 | +0.23 |
+| eden | 1 | +0.43 |
+| blockquant | 1 | -0.77 |
+| e8 | 1 | +1.46 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 1 | +1.920 | [+1.290, +2.550] | lead |
+| rabitq | 1 | +1.490 | [+0.870, +2.120] | lead |
+| pvq | 1 | +1.690 | [+1.050, +2.330] | lead |
+| eden | 1 | +1.490 | [+0.880, +2.110] | lead |
+| blockquant | 1 | +2.690 | [+2.050, +3.320] | lead |
+| e8 | 1 | +0.460 | [-0.160, +1.080] | tied |
+
+**At least one ≥3pp recall@10 gain over the TurboQuant reference (gist_base-ip):** no.
+
+→ wrote ./results/flat-gist_base-ip.md
+→ wrote ./results/flat-gist_base-ip-per-query.csv

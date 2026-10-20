@@ -1,0 +1,51 @@
+# M=4 2-bit: 0.050s (2019972 vec/s), best of 5, spread 1.04x
+# M=4 3-bit: 0.068s (1461131 vec/s), best of 5, spread 1.03x
+# M=4 4-bit: 0.101s (986455 vec/s), best of 5, spread 1.03x
+# M=6 2-bit: 0.109s (916511 vec/s), best of 5, spread 1.02x
+# M=6 3-bit: 0.189s (527905 vec/s), best of 5, spread 1.08x
+# M=6 4-bit: 0.318s (313976 vec/s), best of 4, spread 1.12x
+# M=8 2-bit: 0.348s (287250 vec/s), best of 4, spread 1.02x
+# M=8 3-bit: 0.635s (157407 vec/s), best of 3, spread 1.03x
+# M=8 4-bit: 1.222s (81818 vec/s), best of 3, spread 1.01x
+# M=10 2-bit: 1.381s (72405 vec/s), best of 3, spread 1.00x
+# M=10 3-bit: 2.712s (36873 vec/s), best of 3, spread 1.00x
+# M=10 4-bit: 5.208s (19201 vec/s), best of 3, spread 1.00x
+# M=12 2-bit: 5.712s (17507 vec/s), best of 3, spread 1.00x
+# M=12 3-bit: 10.963s (9121 vec/s), best of 3, spread 1.03x
+# M=12 4-bit: 21.172s (4723 vec/s), best of 3, spread 1.02x
+# M=14 2-bit: 23.458s (4263 vec/s), best of 3, spread 1.02x
+# M=14 3-bit: 48.125s (2078 vec/s), best of 3, spread 1.02x
+# M=14 4-bit: 105.943s (944 vec/s), best of 3, spread 1.01x
+# M=16 2-bit: 98.425s (1016 vec/s), best of 3, spread 1.01x
+# M=16 3-bit: 206.892s (483 vec/s), best of 3, spread 1.02x
+# M=16 4-bit: 1018.761s (98 vec/s), best of 3, spread 1.02x
+
+Encode throughput versus trellis memory at a fixed emitted rate — 100000 normalized SIFT-128 vectors, exact Viterbi, 20 threads
+The emitted payload is identical along each column; only the encoder's search cost changes. Best of up to 5 timed encodes per cell.
+
+| M | 2-bit vec/s | 3-bit vec/s | 4-bit vec/s |
+|---|---|---|---|
+| 4 | 2019972 | 1461131 | 986455 |
+| 6 | 916511 | 527905 | 313976 |
+| 8 | 287250 | 157407 | 81818 |
+| 10 | 72405 | 36873 | 19201 |
+| 12 | 17507 | 9121 | 4723 |
+| 14 | 4263 | 2078 | 944 |
+| 16 | 1016 | 483 | 98 |
+
+=== consecutive memory-step encode-time ratios ===
+| step | 2 bits | 3 bits | 4 bits |
+|---|---|---|---|
+| M=6 / M=4 | 2.18 | 2.78 | 3.15 |
+| M=8 / M=6 | 3.19 | 3.36 | 3.84 |
+| M=10 / M=8 | 3.97 | 4.27 | 4.26 |
+| M=12 / M=10 | 4.14 | 4.04 | 4.07 |
+| M=14 / M=12 | 4.11 | 4.39 | 5.00 |
+| M=16 / M=14 | 4.20 | 4.30 | 9.62 |
+
+M=14 over M=12 at two bits: 4.11x encode time
+M=16 over M=14 at two bits: 4.20x encode time
+
+sample spread: worst 1.12x at M=6 4-bit; median 1.02x over 21 cells, minimum 3 samples each
+
+DONE encode_cost

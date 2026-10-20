@@ -1,0 +1,103 @@
+Rotation-draw variability — 100k base, 1,000 queries, query seed 42, 5 rotation draws [42, 7, 13, 29, 101], trellis memory M=16
+Every codec shares the drawn rotation, so a draw moves the whole field together.
+Rates swept: GIST 1,2,3,4 bit
+
+--- GIST, 1 bit
+| codec | mean R@10 | min | max | spread pp |
+|---|---|---|---|---|
+| blockquant | 0.8778 | 0.8700 | 0.8890 | 1.90 |
+| e8 | 0.8788 | 0.8640 | 0.8840 | 2.00 |
+| eden | 0.8778 | 0.8730 | 0.8860 | 1.30 |
+| pvq | 0.8778 | 0.8680 | 0.8850 | 1.70 |
+| rabitq | 0.8780 | 0.8730 | 0.8870 | 1.40 |
+| trellis | 0.8916 | 0.8800 | 0.9030 | 2.30 |
+| turboquant_baseline | 0.8756 | 0.8680 | 0.8830 | 1.50 |
+
+--- GIST, 1 bit, margin against each comparator
+| comparator | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|
+| blockquant | +1.38 | 0.70 | +0.40 | +1.80 | leads-every-draw |
+| e8 | +1.28 | 1.14 | +0.00 | +2.20 | sign-changes |
+| eden | +1.38 | 1.64 | -0.60 | +3.00 | sign-changes |
+| pvq | +1.38 | 1.03 | +0.00 | +2.00 | sign-changes |
+| rabitq | +1.36 | 1.69 | -0.70 | +3.00 | sign-changes |
+| turboquant_baseline | +1.60 | 1.72 | -0.30 | +2.90 | sign-changes |
+closest comparator e8 at +1.28 pp; every comparator interval excludes zero: False
+
+--- GIST, 2 bit
+| codec | mean R@10 | min | max | spread pp |
+|---|---|---|---|---|
+| blockquant | 0.9384 | 0.9350 | 0.9420 | 0.70 |
+| e8 | 0.9408 | 0.9270 | 0.9480 | 2.10 |
+| eden | 0.9366 | 0.9280 | 0.9400 | 1.20 |
+| pvq | 0.9270 | 0.9170 | 0.9370 | 2.00 |
+| rabitq | 0.9358 | 0.9300 | 0.9390 | 0.90 |
+| trellis | 0.9464 | 0.9370 | 0.9550 | 1.80 |
+| turboquant_baseline | 0.9040 | 0.8940 | 0.9200 | 2.60 |
+| turboquant_residual | 0.8750 | 0.8750 | 0.8750 | 0.00 |
+
+--- GIST, 2 bit, margin against each comparator
+| comparator | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|
+| blockquant | +0.80 | 0.86 | +0.20 | +1.90 | leads-every-draw |
+| e8 | +0.56 | 1.60 | -0.40 | +2.80 | sign-changes |
+| eden | +0.98 | 0.96 | -0.20 | +1.60 | sign-changes |
+| pvq | +1.94 | 1.66 | +0.60 | +3.80 | leads-every-draw |
+| rabitq | +1.06 | 0.83 | +0.00 | +1.60 | sign-changes |
+| turboquant_baseline | +4.24 | 1.03 | +3.50 | +5.60 | leads-every-draw |
+| turboquant_residual | +7.14 | 0.84 | +6.20 | +8.00 | leads-every-draw |
+closest comparator e8 at +0.56 pp; every comparator interval excludes zero: False
+
+--- GIST, 3 bit
+| codec | mean R@10 | min | max | spread pp |
+|---|---|---|---|---|
+| blockquant | 0.9658 | 0.9630 | 0.9670 | 0.40 |
+| eden | 0.9616 | 0.9540 | 0.9650 | 1.10 |
+| pvq | 0.9630 | 0.9610 | 0.9660 | 0.50 |
+| rabitq | 0.9604 | 0.9580 | 0.9620 | 0.40 |
+| trellis | 0.9724 | 0.9700 | 0.9740 | 0.40 |
+| turboquant_baseline | 0.9350 | 0.9290 | 0.9440 | 1.50 |
+| turboquant_residual | 0.9050 | 0.9050 | 0.9050 | 0.00 |
+
+--- GIST, 3 bit, margin against each comparator
+| comparator | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|
+| blockquant | +0.66 | 0.36 | +0.40 | +1.10 | leads-every-draw |
+| eden | +1.08 | 0.55 | +0.70 | +1.80 | leads-every-draw |
+| pvq | +0.94 | 0.40 | +0.60 | +1.30 | leads-every-draw |
+| rabitq | +1.20 | 0.38 | +0.80 | +1.60 | leads-every-draw |
+| turboquant_baseline | +3.74 | 0.76 | +3.00 | +4.40 | leads-every-draw |
+| turboquant_residual | +6.74 | 0.21 | +6.50 | +6.90 | leads-every-draw |
+closest comparator blockquant at +0.66 pp; every comparator interval excludes zero: True
+
+--- GIST, 4 bit
+| codec | mean R@10 | min | max | spread pp |
+|---|---|---|---|---|
+| blockquant | 0.9792 | 0.9760 | 0.9820 | 0.60 |
+| eden | 0.9794 | 0.9770 | 0.9810 | 0.40 |
+| pvq | 0.9760 | 0.9750 | 0.9770 | 0.20 |
+| rabitq | 0.9764 | 0.9750 | 0.9780 | 0.30 |
+| trellis | 0.9838 | 0.9820 | 0.9850 | 0.30 |
+| turboquant_baseline | 0.9592 | 0.9540 | 0.9640 | 1.00 |
+| turboquant_residual | 0.9460 | 0.9460 | 0.9460 | 0.00 |
+
+--- GIST, 4 bit, margin against each comparator
+| comparator | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|
+| blockquant | +0.46 | 0.39 | +0.00 | +0.80 | sign-changes |
+| eden | +0.44 | 0.32 | +0.10 | +0.80 | leads-every-draw |
+| pvq | +0.78 | 0.20 | +0.50 | +0.90 | leads-every-draw |
+| rabitq | +0.74 | 0.29 | +0.40 | +0.90 | leads-every-draw |
+| turboquant_baseline | +2.46 | 0.56 | +2.00 | +3.10 | leads-every-draw |
+| turboquant_residual | +3.78 | 0.14 | +3.60 | +3.90 | leads-every-draw |
+closest comparator eden at +0.44 pp; every comparator interval excludes zero: True
+
+=== margin summary ===
+| corpus | bits | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|---|
+| GIST | 1 | +0.66 | 1.02 | -0.70 | +1.40 | sign-changes |
+| GIST | 2 | +0.30 | 0.92 | -0.40 | +1.50 | sign-changes |
+| GIST | 3 | +0.66 | 0.36 | +0.40 | +1.10 | leads-every-draw |
+| GIST | 4 | +0.34 | 0.29 | +0.00 | +0.60 | sign-changes |
+
+DONE rotation_seed_ci

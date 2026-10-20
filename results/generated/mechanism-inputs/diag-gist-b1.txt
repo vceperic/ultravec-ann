@@ -1,0 +1,18 @@
+diag: gist_base — 100000 vectors, dim 1024, bits 1, seed 42
+  external queries: 200 from data/gist/gist_query.fvecs
+# Estimator-variance diagnostic — gist_base
+
+- dim **1024**, db **100000**, queries **100**, seed **42**
+- `g=⟨ō,o⟩` recon-to-truth cosine; `κ=√((1−g²)/g²)`; `σ_pred=κ/√(D−1)` (RaBitQ Thm-3.2 per-pair std); `σ_emp`=std(estimate−exact)
+
+| backend | bits | M | mean g | κ | σ_pred | σ_emp | bias | recon MSE |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 1 | 0 | 0.6339 | 1.2202 | 0.03815 | 0.03221 | -0.27048 | 0.36839 |
+| rabitq | 1 | 0 | 0.7947 | 0.7637 | 0.02388 | 0.01501 | -0.00236 | 0.41052 |
+| trellis | 1 | 12 | 0.8532 | 0.6113 | 0.01911 | 0.01277 | -0.00067 | 0.29362 |
+| pvq | 1 | 0 | 0.8088 | 0.7272 | 0.02274 | 0.01481 | +0.00055 | 0.38247 |
+| eden | 1 | 0 | 0.7947 | 0.7637 | 0.02388 | 0.01501 | -0.00236 | 0.41052 |
+| blockquant | 1 | 0 | 0.8072 | 0.7313 | 0.02286 | 0.01513 | +0.00288 | 0.38560 |
+| e8 | 1 | 0 | 0.8246 | 0.6861 | 0.02145 | 0.01420 | +0.00041 | 0.35084 |
+
+→ wrote <scratch-directory>/diag-gist_base-m12-b1.md

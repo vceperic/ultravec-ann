@@ -1,0 +1,48 @@
+bench: sift_base — 100000 vectors, dim 128, bits [1], seed 42
+  IP metric, external queries: 200 from data/sift/sift_query.fvecs
+  evaluated queries: 200
+# Phase 2 benchmark — sift_base-ip
+
+- dim **128**, db **100000**, queries **200**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 1 | 0.305 | 0.305 | 0.397 | 0.36997 | 27889.6 | 24 | 24 |
+| rabitq | 1 | 0.220 | 0.244 | 0.360 | 0.41247 | 29975.1 | 24 | 24 |
+| trellis | 1 | 0.260 | 0.322 | 0.433 | 0.26629 | 13955.0 | 26 | 666 |
+| pvq | 1 | 0.215 | 0.272 | 0.381 | 0.37784 | 9515.2 | 25 | 25 |
+| eden | 1 | 0.220 | 0.244 | 0.360 | 0.41247 | 35033.1 | 24 | 24 |
+| blockquant | 1 | 0.240 | 0.263 | 0.368 | 0.37246 | 20525.9 | 24 | 24 |
+| e8 | 1 | 0.240 | 0.273 | 0.369 | 0.34695 | 15710.9 | 24 | 24 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| rabitq | 1 | -6.05 |
+| trellis | 1 | +1.70 |
+| pvq | 1 | -3.25 |
+| eden | 1 | -6.05 |
+| blockquant | 1 | -4.15 |
+| e8 | 1 | -3.20 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 1 | +1.700 | [-0.650, +4.000] | tied |
+| rabitq | 1 | +7.750 | [+5.350, +10.150] | lead |
+| pvq | 1 | +4.950 | [+2.550, +7.400] | lead |
+| eden | 1 | +7.750 | [+5.350, +10.100] | lead |
+| blockquant | 1 | +5.850 | [+3.450, +8.200] | lead |
+| e8 | 1 | +4.900 | [+2.550, +7.250] | lead |
+
+**Gate 3 (sift_base-ip):** FAIL — ≥3pp recall@10 gain over baseline on this dataset.
+
+→ wrote <scratch-directory>/phase2-sift_base-ip.md
+→ wrote <scratch-directory>/phase2-sift_base-ip-per-query.csv

@@ -1,0 +1,50 @@
+bench: gist_base — 100000 vectors, dim 1024, bits [2, 3, 4], seed 42
+  IP metric, external queries: 1000 from data/gist/gist_query.fvecs
+  evaluated queries: 1000
+# Flat codec benchmark — gist_base-ip
+
+- dim **1024**, db **100000**, queries **1000**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 2 | 0.988 | 0.900 | 0.906 | 0.12028 | 326925.5 | 264 | 304 |
+| turboquant_residual | 2 | 0.987 | 0.890 | 0.897 | — | 473710.6 | 268 | 268 |
+| trellis | 2 | 0.995 | 0.937 | 0.956 | 0.06707 | 165310.3 | 266 | 4431 |
+| turboquant_baseline | 3 | 0.989 | 0.944 | 0.936 | 0.03612 | 335369.0 | 392 | 432 |
+| turboquant_residual | 3 | 0.986 | 0.933 | 0.935 | — | 499769.3 | 396 | 396 |
+| trellis | 3 | 0.996 | 0.974 | 0.977 | 0.01675 | 164142.8 | 394 | 4564 |
+| turboquant_baseline | 4 | 0.993 | 0.954 | 0.961 | 0.01017 | 311085.0 | 520 | 560 |
+| turboquant_residual | 4 | 0.990 | 0.960 | 0.961 | — | 506083.5 | 524 | 524 |
+| trellis | 4 | 0.999 | 0.985 | 0.988 | 0.00420 | 203667.7 | 522 | 4703 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| turboquant_residual | 2 | -0.99 |
+| trellis | 2 | +3.67 |
+| turboquant_residual | 3 | -1.07 |
+| trellis | 3 | +2.97 |
+| turboquant_residual | 4 | +0.64 |
+| trellis | 4 | +3.13 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 2 | +3.670 | [+3.160, +4.190] | lead |
+| turboquant_residual | 2 | +4.660 | [+4.120, +5.180] | lead |
+| turboquant_baseline | 3 | +2.970 | [+2.570, +3.370] | lead |
+| turboquant_residual | 3 | +4.040 | [+3.610, +4.470] | lead |
+| turboquant_baseline | 4 | +3.130 | [+2.760, +3.510] | lead |
+| turboquant_residual | 4 | +2.490 | [+2.120, +2.850] | lead |
+
+**At least one ≥3pp recall@10 gain over the TurboQuant reference (gist_base-ip):** yes.
+
+→ wrote ./results/flat-gist_base-ip.md
+→ wrote ./results/flat-gist_base-ip-per-query.csv

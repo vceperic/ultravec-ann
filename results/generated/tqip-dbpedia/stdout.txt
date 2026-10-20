@@ -1,0 +1,50 @@
+bench: dbpedia_base — 100000 vectors, dim 2048, bits [2, 3, 4], seed 42
+  IP metric, external queries: 1000 from data/dbpedia/dbpedia_query.fvecs
+  evaluated queries: 1000
+# Flat codec benchmark — dbpedia_base-ip
+
+- dim **2048**, db **100000**, queries **1000**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 2 | 0.750 | 0.755 | 0.784 | 0.11416 | 710263.7 | 520 | 560 |
+| turboquant_residual | 2 | 0.696 | 0.727 | 0.762 | — | 993389.6 | 524 | 524 |
+| trellis | 2 | 0.871 | 0.881 | 0.897 | 0.06737 | 392655.3 | 522 | 8783 |
+| turboquant_baseline | 3 | 0.806 | 0.832 | 0.861 | 0.03332 | 644184.6 | 776 | 816 |
+| turboquant_residual | 3 | 0.770 | 0.819 | 0.847 | — | 975581.5 | 780 | 780 |
+| trellis | 3 | 0.945 | 0.942 | 0.949 | 0.01676 | 362333.9 | 778 | 9044 |
+| turboquant_baseline | 4 | 0.882 | 0.901 | 0.921 | 0.00914 | 625906.5 | 1032 | 1072 |
+| turboquant_residual | 4 | 0.889 | 0.896 | 0.914 | — | 1007681.9 | 1036 | 1036 |
+| trellis | 4 | 0.965 | 0.968 | 0.973 | 0.00419 | 377415.6 | 1034 | 9311 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| turboquant_residual | 2 | -2.81 |
+| trellis | 2 | +12.56 |
+| turboquant_residual | 3 | -1.35 |
+| trellis | 3 | +10.96 |
+| turboquant_residual | 4 | -0.41 |
+| trellis | 4 | +6.75 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 2 | +12.560 | [+11.800, +13.330] | lead |
+| turboquant_residual | 2 | +15.370 | [+14.640, +16.120] | lead |
+| turboquant_baseline | 3 | +10.960 | [+10.300, +11.620] | lead |
+| turboquant_residual | 3 | +12.310 | [+11.660, +12.970] | lead |
+| turboquant_baseline | 4 | +6.750 | [+6.240, +7.260] | lead |
+| turboquant_residual | 4 | +7.160 | [+6.620, +7.710] | lead |
+
+**At least one ≥3pp recall@10 gain over the TurboQuant reference (dbpedia_base-ip):** yes.
+
+→ wrote ./results/flat-dbpedia_base-ip.md
+→ wrote ./results/flat-dbpedia_base-ip-per-query.csv

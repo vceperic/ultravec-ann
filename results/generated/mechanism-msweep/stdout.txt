@@ -1,0 +1,31 @@
+[msweep] M=2
+[msweep] M=4
+[msweep] M=6
+[msweep] M=8
+[msweep] M=10
+[msweep] M=12
+[msweep] M=14
+[msweep] M=16
+
+# Trellis memory sweep — direction fidelity at a fixed emitted rate
+
+- SIFT-100k, 100 sampled queries against a seeded 1000-vector database subsample, 2 bits/dim, seed 42
+- same corpus, rate and seed as the appendix ablations, which instead score 1,000 queries over the full base
+- emitted bits per transformed dimension is 2 at every M; only the start-state field (ceil(M/8) B) changes size
+
+| M | start-state B | mean g | kappa | sigma_pred | sigma_emp | recon MSE |
+|---|---|---|---|---|---|---|
+| 2 | 1 | 0.8761 | 0.5498 | 0.04879 | 0.04357 | 0.24773 |
+| 4 | 1 | 0.9365 | 0.3741 | 0.03320 | 0.03017 | 0.12707 |
+| 6 | 1 | 0.9553 | 0.3093 | 0.02745 | 0.02413 | 0.08948 |
+| 8 | 1 | 0.9621 | 0.2833 | 0.02514 | 0.02177 | 0.07581 |
+| 10 | 2 | 0.9658 | 0.2682 | 0.02380 | 0.02104 | 0.06832 |
+| 12 | 2 | 0.9678 | 0.2602 | 0.02309 | 0.02014 | 0.06448 |
+| 14 | 2 | 0.9691 | 0.2544 | 0.02258 | 0.02014 | 0.06177 |
+| 16 | 2 | 0.9703 | 0.2492 | 0.02211 | 0.01956 | 0.05936 |
+
+- g rises from 0.8761 at M=2 to 0.9703 at M=16 (delta +0.0942); monotone non-decreasing: True
+- estimator std falls from 0.04357 to 0.01956 over the same sweep
+- E-RaBitQ reference (no memory lever): g = 0.9351, spread across the sweep 0.0000 — flat, as expected
+
+DONE mechanism_msweep

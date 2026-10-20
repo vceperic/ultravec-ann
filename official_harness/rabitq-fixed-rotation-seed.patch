@@ -1,0 +1,14 @@
+diff --git a/include/rabitqlib/utils/rotator.hpp b/include/rabitqlib/utils/rotator.hpp
+index d5e4796..f9612f5 100644
+--- a/include/rabitqlib/utils/rotator.hpp
++++ b/include/rabitqlib/utils/rotator.hpp
+@@ -130,8 +130,7 @@ class FhtKacRotator : public Rotator<float> {
+    public:
+     explicit FhtKacRotator(size_t dim, size_t padded_dim)
+         : Rotator<float>(dim, padded_dim), flip_(4 * padded_dim / kByteLen) {
+-        std::random_device rd;   // Seed
+-        std::mt19937 gen(rd());  // Mersenne Twister RNG
++        std::mt19937 gen(42U);  // Artifact-only deterministic rotation seed.
+ 
+         // Uniform distribution in the range [0, 255]
+         std::uniform_int_distribution<int> dist(0, 255);

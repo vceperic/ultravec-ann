@@ -1,0 +1,14 @@
+SIFT-1M: 1000000 base, 200 queries, dim 128, 20 threads
+computing exact gold ...
+
+=== IVF1024,PQ32  (code=32 B/vec, resident>=32 B/vec, build 8.6s) ===
+  nprobe   R@10      QPS
+      1   0.2560       62249
+      2   0.3240       29358
+      4   0.3850       29570
+      8   0.4145       28608
+     16   0.4270       26168
+     32   0.4370       15809
+     64   0.4370        9100
+
+DONE faiss_ivfpq_qps

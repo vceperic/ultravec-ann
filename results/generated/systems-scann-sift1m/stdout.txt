@@ -1,0 +1,19 @@
+SIFT-1M: 1000000 base, 200 queries, dim 128, 20 search threads, 1 training thread, seed 42
+computing exact gold ...
+building ScaNN (tree + AH) ...
+built in 39.3s, ~32 B/vec (AH 2dims/block, 4-bit)
+building independent-process ScaNN determinism check ...
+determinism: PASS (two independent processes returned identical neighbors for every searched-leaf setting)
+
+=== ScaNN tree+AH — recall@10 vs QPS ===
+  nls    R@10      QPS
+     1   0.2905      130288
+     2   0.4010      103468
+     4   0.4970       74992
+     8   0.5565       50088
+    16   0.6015       30845
+    32   0.6190       18450
+    64   0.6245       10737
+   128   0.6255        5930
+
+DONE scann_qps

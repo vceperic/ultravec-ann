@@ -1,0 +1,108 @@
+bench: sift_base — 1000000 vectors, dim 128, bits [1, 2, 3, 4], seed 42
+  IP metric, external queries: 1000 from data/sift/sift_query.fvecs
+  evaluated queries: 1000
+# Flat codec benchmark — sift_base-ip
+
+- dim **128**, db **1000000**, queries **1000**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 1 | 0.180 | 0.201 | 0.267 | 0.36889 | 289466.1 | 24 | 64 |
+| rabitq | 1 | 0.093 | 0.140 | 0.220 | 0.41112 | 200885.7 | 24 | 72 |
+| trellis | 1 | 0.178 | 0.215 | 0.310 | 0.24705 | 370684.3 | 26 | 602 |
+| pvq | 1 | 0.118 | 0.152 | 0.237 | 0.37858 | 229252.3 | 25 | 97 |
+| eden | 1 | 0.093 | 0.140 | 0.220 | 0.41112 | 294310.5 | 24 | 24 |
+| blockquant | 1 | 0.119 | 0.159 | 0.244 | 0.35443 | 199304.9 | 24 | 24 |
+| e8 | 1 | 0.114 | 0.157 | 0.237 | 0.34642 | 199260.9 | 24 | 24 |
+| turboquant_baseline | 2 | 0.107 | 0.179 | 0.268 | 0.12513 | 297314.2 | 40 | 80 |
+| turboquant_residual | 2 | 0.216 | 0.252 | 0.324 | — | 444726.8 | 44 | 44 |
+| rabitq | 2 | 0.337 | 0.423 | 0.514 | 0.12934 | 188548.6 | 40 | 88 |
+| trellis | 2 | 0.451 | 0.555 | 0.634 | 0.05925 | 345242.0 | 42 | 618 |
+| pvq | 2 | 0.380 | 0.469 | 0.549 | 0.09715 | 304722.7 | 41 | 113 |
+| eden | 2 | 0.328 | 0.433 | 0.515 | 0.12860 | 289734.3 | 40 | 40 |
+| blockquant | 2 | 0.351 | 0.456 | 0.544 | 0.10322 | 216171.6 | 40 | 40 |
+| e8 | 2 | 0.388 | 0.480 | 0.563 | 0.09249 | 229633.3 | 40 | 42 |
+| turboquant_baseline | 3 | 0.222 | 0.290 | 0.399 | 0.03952 | 311479.0 | 56 | 96 |
+| turboquant_residual | 3 | 0.127 | 0.212 | 0.304 | — | 503887.5 | 60 | 60 |
+| rabitq | 3 | 0.546 | 0.643 | 0.707 | 0.04149 | 195459.1 | 56 | 104 |
+| trellis | 3 | 0.678 | 0.761 | 0.813 | 0.01479 | 364442.5 | 58 | 635 |
+| pvq | 3 | 0.598 | 0.693 | 0.755 | 0.02807 | 425289.7 | 57 | 129 |
+| eden | 3 | 0.567 | 0.660 | 0.718 | 0.03939 | 311349.0 | 56 | 56 |
+| blockquant | 3 | 0.606 | 0.699 | 0.752 | 0.02719 | 263032.0 | 56 | 56 |
+| turboquant_baseline | 4 | 0.369 | 0.463 | 0.566 | 0.01139 | 304052.3 | 72 | 112 |
+| turboquant_residual | 4 | 0.258 | 0.324 | 0.435 | — | 522794.7 | 76 | 76 |
+| rabitq | 4 | 0.728 | 0.784 | 0.830 | 0.01229 | 197944.9 | 72 | 120 |
+| trellis | 4 | 0.809 | 0.873 | 0.905 | 0.00370 | 379087.2 | 74 | 652 |
+| pvq | 4 | 0.736 | 0.816 | 0.858 | 0.01127 | 482428.6 | 73 | 145 |
+| eden | 4 | 0.737 | 0.800 | 0.846 | 0.01116 | 320352.0 | 72 | 72 |
+| blockquant | 4 | 0.733 | 0.817 | 0.858 | 0.00900 | 295113.8 | 72 | 72 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| rabitq | 1 | -6.04 |
+| trellis | 1 | +1.41 |
+| pvq | 1 | -4.84 |
+| eden | 1 | -6.04 |
+| blockquant | 1 | -4.16 |
+| e8 | 1 | -4.41 |
+| turboquant_residual | 2 | +7.31 |
+| rabitq | 2 | +24.40 |
+| trellis | 2 | +37.59 |
+| pvq | 2 | +29.01 |
+| eden | 2 | +25.37 |
+| blockquant | 2 | +27.71 |
+| e8 | 2 | +30.05 |
+| turboquant_residual | 3 | -7.78 |
+| rabitq | 3 | +35.34 |
+| trellis | 3 | +47.09 |
+| pvq | 3 | +40.35 |
+| eden | 3 | +37.00 |
+| blockquant | 3 | +40.90 |
+| turboquant_residual | 4 | -13.90 |
+| rabitq | 4 | +32.11 |
+| trellis | 4 | +41.02 |
+| pvq | 4 | +35.31 |
+| eden | 4 | +33.73 |
+| blockquant | 4 | +35.38 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 1 | +1.410 | [+0.360, +2.450] | lead |
+| rabitq | 1 | +7.450 | [+6.510, +8.400] | lead |
+| pvq | 1 | +6.250 | [+5.230, +7.270] | lead |
+| eden | 1 | +7.450 | [+6.510, +8.400] | lead |
+| blockquant | 1 | +5.570 | [+4.620, +6.510] | lead |
+| e8 | 1 | +5.820 | [+4.870, +6.820] | lead |
+| turboquant_baseline | 2 | +37.590 | [+36.510, +38.670] | lead |
+| turboquant_residual | 2 | +30.280 | [+29.160, +31.390] | lead |
+| rabitq | 2 | +13.190 | [+12.100, +14.290] | lead |
+| pvq | 2 | +8.580 | [+7.470, +9.660] | lead |
+| eden | 2 | +12.220 | [+11.160, +13.260] | lead |
+| blockquant | 2 | +9.880 | [+8.810, +10.960] | lead |
+| e8 | 2 | +7.540 | [+6.450, +8.620] | lead |
+| turboquant_baseline | 3 | +47.090 | [+46.020, +48.170] | lead |
+| turboquant_residual | 3 | +54.870 | [+53.790, +55.880] | lead |
+| rabitq | 3 | +11.750 | [+10.820, +12.680] | lead |
+| pvq | 3 | +6.740 | [+5.880, +7.590] | lead |
+| eden | 3 | +10.090 | [+9.170, +10.960] | lead |
+| blockquant | 3 | +6.190 | [+5.310, +7.080] | lead |
+| turboquant_baseline | 4 | +41.020 | [+39.920, +42.150] | lead |
+| turboquant_residual | 4 | +54.920 | [+53.850, +55.980] | lead |
+| rabitq | 4 | +8.910 | [+8.210, +9.610] | lead |
+| pvq | 4 | +5.710 | [+5.030, +6.410] | lead |
+| eden | 4 | +7.290 | [+6.590, +7.990] | lead |
+| blockquant | 4 | +5.640 | [+4.940, +6.320] | lead |
+
+**At least one ≥3pp recall@10 gain over the TurboQuant reference (sift_base-ip):** yes.
+
+→ wrote ./results/flat-sift_base-ip.md
+→ wrote ./results/flat-sift_base-ip-per-query.csv

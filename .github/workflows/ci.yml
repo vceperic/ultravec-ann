@@ -1,0 +1,117 @@
+name: artifact-ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # Run the hygiene scan FIRST, on a pristine checkout. After a build,
+      # target/ contains dependency files embedding the builder's absolute paths,
+      # which are build output rather than shipped content; scanning before the
+      # build keeps the signal about the repository itself.
+      - name: Private-path and credential scan
+        run: |
+          ! grep -RInE '(/(home|root|Users)/|/\.(claude|codex)/|BEGIN (RSA |OPENSSH )?PRIVATE KEY|api[_-]?key[[:space:]]*=)' \
+            --exclude-dir=.git --exclude-dir=target --exclude-dir=data \
+            --exclude=ci.yml .
+
+      - uses: dtolnay/rust-toolchain@1.96.0
+        with:
+          components: rustfmt,clippy
+      - uses: Swatinem/rust-cache@v2
+      - uses: actions/setup-python@v5
+        with:
+          # requirements.txt is compiled for 3.12 with hashes, and the pinned
+          # ScaNN wheel is cp312-only, so 3.11 cannot resolve the locked set.
+          python-version: "3.12"
+
+      # The protocol tests are not stdlib-only: test_shift_protocol imports numpy at
+      # module level and the driver it exercises needs scikit-learn. Without this the
+      # `unittest discover` step below turned every import error into a _FailedTest
+      # and the job was red on every push -- as was `reproduce.py check`, which runs
+      # the same command. requirements.txt is hash-pinned, so this is also the check
+      # that the lock still resolves.
+      - name: Python environment
+        run: pip install --require-hashes -r requirements.txt
+
+      - name: Artifact configuration
+        run: |
+          python3 scripts/reproduce.py --list
+          python3 scripts/validate_claims.py --schema-only
+          python3 scripts/download_datasets.py list
+
+      - name: Require reproducible lockfile
+        run: test -f Cargo.lock
+
+      - name: Rust checks
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --locked --all-targets -- -D warnings
+          cargo test --locked --all-targets
+
+      - name: Python protocol tests
+        run: |
+          python3 -m unittest discover -s scripts -p 'test_*.py' -v
+
+      # Full claim validation, not --schema-only: this exercises the evidence
+      # checks (bundle presence and consistency, recorded dataset hashes, baseline
+      # pins and lock-file hashes) that the schema pass short-circuits past. It does
+      # NOT check commit ancestry or the computation hash at the authoring commit --
+      # neither resolves without the authoring history, so both degrade to a NOTE
+      # here and are gated upstream by `make check-provenance`. This is the check an
+      # external reviewer runs, so CI must run it too.
+      - name: Validate claims against retained evidence
+        run: |
+          python3 scripts/validate_claims.py
+
+      - name: Fresh-repository and source-archive portability
+        run: |
+          mkdir -p /tmp/ultravec-fresh /tmp/ultravec-source
+          tar --exclude=.git --exclude=target --exclude=data -cf - . |
+            tar -xf - -C /tmp/ultravec-fresh
+          (
+            cd /tmp/ultravec-fresh
+            git init -q
+            git config user.name artifact-ci
+            git config user.email artifact-ci@example.invalid
+            git add .
+            git commit -qm snapshot
+            python3 scripts/validate_claims.py
+            python3 -m unittest \
+              scripts.test_bundle_hygiene \
+              scripts.test_claim_validation \
+              scripts.test_release_metadata
+          )
+          tar --exclude=.git --exclude=target --exclude=data -cf - . |
+            tar -xf - -C /tmp/ultravec-source
+          (
+            cd /tmp/ultravec-source
+            python3 scripts/reproduce.py check
+            python3 scripts/validate_claims.py
+            python3 -m unittest \
+              scripts.test_bundle_hygiene \
+              scripts.test_claim_validation \
+              scripts.test_release_metadata
+          )
+
+  container:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t ultravec-ann-artifact .
+      # Building the image proves nothing about whether it can run. `doctor` is
+      # the artifact's own advertised first command, so exercise it.
+      - run: docker run --rm ultravec-ann-artifact python3 scripts/reproduce.py doctor
+      - run: docker run --rm ultravec-ann-artifact python3 scripts/validate_claims.py
+      # The image ships no Git history, and evidence tiers refuse to run without a
+      # committed snapshot, so `smoke` is the deepest tier it can execute. Running it
+      # is what proves the toolchain inside the image actually works end to end.
+      - run: docker run --rm ultravec-ann-artifact python3 scripts/reproduce.py smoke

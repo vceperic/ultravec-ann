@@ -1,0 +1,2 @@
+    Finished `release` profile [optimized] target(s) in 0.00s
+     Running `target/release/ultravec bench --dataset data/sift/sift_base.fvecs --query-file data/sift/sift_query.fvecs --query-max 1000 --max 100000 --bits 1,2,3,4 --metric ip --seed 42 --sota3 --per-query-out results/generated/common-reconstruction-sift/per-query.csv`

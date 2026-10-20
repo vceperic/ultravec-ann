@@ -1,0 +1,2 @@
+    Finished `release` profile [optimized] target(s) in 0.00s
+     Running `target/release/ultravec bench --dataset data/smoke/base.fvecs --query-file data/smoke/query.fvecs --query-max 16 --max 128 --bits 2 --seed 42 --sota3 --per-query-out results/generated/smoke-synthetic/per-query.csv`

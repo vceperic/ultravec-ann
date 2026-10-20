@@ -1,0 +1,57 @@
+Rotation-draw variability — 100k base, 1,000 queries, query seed 42, 5 rotation draws [42, 7, 13, 29, 101], trellis memory M=16
+Every codec shares the drawn rotation, so a draw moves the whole field together.
+Rates swept: DBpedia 1,2 bit
+
+--- DBpedia, 1 bit
+| codec | mean R@10 | min | max | spread pp |
+|---|---|---|---|---|
+| blockquant | 0.7384 | 0.7360 | 0.7400 | 0.40 |
+| e8 | 0.7394 | 0.7340 | 0.7420 | 0.80 |
+| eden | 0.7328 | 0.7280 | 0.7350 | 0.70 |
+| pvq | 0.7366 | 0.7320 | 0.7380 | 0.60 |
+| rabitq | 0.7328 | 0.7280 | 0.7350 | 0.70 |
+| trellis | 0.7562 | 0.7500 | 0.7630 | 1.30 |
+| turboquant_baseline | 0.7366 | 0.7330 | 0.7410 | 0.80 |
+
+--- DBpedia, 1 bit, margin against each comparator
+| comparator | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|
+| blockquant | +1.78 | 0.71 | +1.30 | +2.40 | leads-every-draw |
+| e8 | +1.68 | 0.75 | +0.80 | +2.10 | leads-every-draw |
+| eden | +2.34 | 0.92 | +1.50 | +3.20 | leads-every-draw |
+| pvq | +1.96 | 0.49 | +1.50 | +2.50 | leads-every-draw |
+| rabitq | +2.34 | 0.92 | +1.50 | +3.20 | leads-every-draw |
+| turboquant_baseline | +1.96 | 0.67 | +1.30 | +2.60 | leads-every-draw |
+closest comparator e8 at +1.68 pp; every comparator interval excludes zero: True
+
+--- DBpedia, 2 bit
+| codec | mean R@10 | min | max | spread pp |
+|---|---|---|---|---|
+| blockquant | 0.8612 | 0.8590 | 0.8630 | 0.40 |
+| e8 | 0.8696 | 0.8680 | 0.8720 | 0.40 |
+| eden | 0.8542 | 0.8520 | 0.8550 | 0.30 |
+| pvq | 0.8518 | 0.8500 | 0.8540 | 0.40 |
+| rabitq | 0.8530 | 0.8500 | 0.8560 | 0.60 |
+| trellis | 0.8818 | 0.8790 | 0.8840 | 0.50 |
+| turboquant_baseline | 0.7570 | 0.7530 | 0.7610 | 0.80 |
+| turboquant_residual | 0.7440 | 0.7440 | 0.7440 | 0.00 |
+
+--- DBpedia, 2 bit, margin against each comparator
+| comparator | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|
+| blockquant | +2.06 | 0.29 | +1.80 | +2.30 | leads-every-draw |
+| e8 | +1.22 | 0.39 | +0.90 | +1.60 | leads-every-draw |
+| eden | +2.76 | 0.23 | +2.60 | +3.00 | leads-every-draw |
+| pvq | +3.00 | 0.46 | +2.50 | +3.40 | leads-every-draw |
+| rabitq | +2.88 | 0.32 | +2.60 | +3.30 | leads-every-draw |
+| turboquant_baseline | +12.48 | 0.34 | +12.10 | +12.80 | leads-every-draw |
+| turboquant_residual | +13.78 | 0.27 | +13.50 | +14.00 | leads-every-draw |
+closest comparator e8 at +1.22 pp; every comparator interval excludes zero: True
+
+=== margin summary ===
+| corpus | bits | margin pp | CI half | min | max | verdict |
+|---|---|---|---|---|---|---|
+| DBpedia | 1 | +1.56 | 0.69 | +0.80 | +2.10 | leads-every-draw |
+| DBpedia | 2 | +1.22 | 0.39 | +0.90 | +1.60 | leads-every-draw |
+
+DONE rotation_seed_ci

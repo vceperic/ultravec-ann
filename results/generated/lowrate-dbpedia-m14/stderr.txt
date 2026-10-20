@@ -1,0 +1,14 @@
+warning: field `scale` is never read
+   --> src/trellis.rs:113:5
+    |
+ 91 | struct TVec {
+    |        ---- field in this struct
+...
+113 |     scale: f32,      // per-vector std used to map code → original rotated space
+    |     ^^^^^
+    |
+    = note: `#[warn(dead_code)]` (part of `#[warn(unused)]`) on by default
+
+warning: `ultravec` (lib) generated 1 warning
+    Finished `release` profile [optimized] target(s) in 0.58s
+     Running `target/release/ultravec bench --dataset data/dbpedia/dbpedia_base.fvecs --query-file data/dbpedia/dbpedia_query.fvecs --query-max 1000 --max 100000 --bits 1 --metric ip --seed 42 --sota3`

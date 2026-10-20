@@ -1,0 +1,8 @@
+# Direct Python dependencies used by the reproducibility harness.
+# Baseline versions are fixed to the versions reported in the manuscript.
+faiss-cpu==1.14.2
+scann==1.4.2
+h5py==3.16.0
+pyarrow==25.0.0
+scikit-learn==1.9.0
+matplotlib==3.11.1

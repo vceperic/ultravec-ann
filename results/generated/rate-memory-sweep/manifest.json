@@ -1,0 +1,63 @@
+{
+  "artifact_commit": "10602da23a285afc2a2eb9d4e58c9bd3b335d8d3",
+  "artifact_computation_sha256": "36903ce509a409a482a8a1784c8e445893cce1d92f19c876c027e1e811852fe1",
+  "artifact_dirty": false,
+  "artifact_tree": "d7a454197f3b12e9b95a9dde8d1e6d81f3bb1a17",
+  "baseline_manifest_sha256": "af050feeaeb1d4685d64875be35e70272c651e8f689359a68bc0409fb67f6bb0",
+  "baseline_revisions": {
+    "faiss-cpu": {
+      "kind": "python-wheel",
+      "license": "MIT",
+      "version": "1.14.2",
+      "wheel_sha256": "ec4784d9a14973f2eead3a3480e6d14e74253b234e2c12717d4319f21dfadfcd"
+    },
+    "rabitq-library": {
+      "kind": "git",
+      "license": "Apache-2.0",
+      "reproducibility_patch": "official_harness/rabitq-fixed-rotation-seed.patch",
+      "reproducibility_patch_sha256": "6d136297fdc2d9c76e3829547c2a4829ed042a24adaa60a95570ad6b6ebcc63f",
+      "revision": "540242ea0a68926f1b827bf1f9add844f07a427b"
+    },
+    "scann": {
+      "kind": "python-wheel",
+      "license": "Apache-2.0",
+      "version": "1.4.2",
+      "wheel_sha256": "c0f45d810e629fdcdf8da546d1e25bde4664d27dcf5c3399aa335b4934a0734c"
+    }
+  },
+  "campaign_start_commit": "10602da23a285afc2a2eb9d4e58c9bd3b335d8d3",
+  "campaign_start_computation_sha256": "36903ce509a409a482a8a1784c8e445893cce1d92f19c876c027e1e811852fe1",
+  "campaign_start_dirty": false,
+  "command": [
+    "python3",
+    "scripts/rate_memory_sweep.py"
+  ],
+  "completed_utc": "2026-08-12T07:07:51.103632+00:00",
+  "cpu": "AMD Ryzen 9 7950X 16-Core Processor",
+  "dataset_manifest_sha256": "e1c8a108a6587977f91f3c5cadfa45975373e4c8160c07b5086f83433ab7eae5",
+  "dataset_sha256": {
+    "data/erab/base.fvecs": "7a5ce1d237d72aef26a306b299b2150e59261020700d3d5834f33ad83e9991f6",
+    "data/erab/gold.ivecs": "fd20d482f053795d67f857d33e892a29c714948ee81a29408417a0a64325bda1",
+    "data/erab/query.fvecs": "ac2fe1d3446c93a380d988bd4a816abfd1e77bdeae78c146f91835adfe50bae3"
+  },
+  "dependency_bundle_sha256": {},
+  "derived_manifest_sha256": "0f760a3de665b2873fdb2dad22b1c279b420bee9c18f6469ccfbf4aa4502f1d2",
+  "experiment": "rate-memory-sweep",
+  "python_lock_sha256": "c8ae68c9251badf8735c5dcad040402f5505295aa714a3d042695d91a971fbe9",
+  "rebased_from_commit": "0129d25e887eeb69358c6f4a844b007f009dc80e",
+  "schema_version": 1,
+  "seed": 42,
+  "status": "passed",
+  "threads": {
+    "omp": "20",
+    "rayon": "20"
+  },
+  "toolchain": {
+    "cargo": "cargo 1.96.0 (30a34c682 2026-05-25)",
+    "python": "3.12.3",
+    "rustc": "rustc 1.96.0 (ac68faa20 2026-05-25)"
+  },
+  "ultravec_env": {
+    "ULTRAVEC_TRELLIS_MEM": "12"
+  }
+}

@@ -1,0 +1,34 @@
+cff-version: 1.2.0
+message: "If you use this artifact, please cite the associated paper."
+title: "UltraVec: Trellis-Coded Quantization for Calibration-Free Low-Bit Vector Search — Artifact"
+type: software
+version: 0.1.0
+authors:
+  - given-names: "Vladimir"
+    family-names: "Čeperić"
+    affiliation: "University of Zagreb Faculty of Electrical Engineering and Computing"
+    email: "vladimir.ceperic@fer.hr"
+    orcid: "https://orcid.org/0000-0002-7059-2369"
+license: MIT
+license-url: "https://opensource.org/licenses/MIT"
+repository-code: "https://github.com/vceperic/ultravec-ann"
+abstract: "Pure-Rust, BLAS-free implementation of UltraVec, a calibration-free trellis-coded quantizer for low-bit approximate nearest-neighbor search, with its full reproduction harness and retained provenance bundles. Against seven data-oblivious comparators on SIFT, GIST and DBpedia-OpenAI, UltraVec has the highest mean flat MIPS Recall@10 in 11 of 12 corpus-rate cells with paired intervals excluding zero against every comparator, and the highest Recall@100 and lowest reconstruction error in all 12, 19 to 59% below the next-lowest codec's; no comparator separates above it in any cell. On a shared footing with the pinned upstream E-RaBitQ library it leads by 4.2 to 7.7 points at every rate on SIFT. On SIFT's full 1,000,000-vector base all 25 pairwise intervals exclude zero. In a million-vector IVF index it passes the best Recall@10 of E-RaBitQ and of trained Faiss IVFPQ from four probes at 3.5 times E-RaBitQ's throughput and peaks within 2.7 points of trained ScaNN; in a controlled HNSW study it leads E-RaBitQ .5240 to .4440, and codes-only navigation keeps recall at a third of the resident memory with 14% higher throughput. Trellis memory raises direction fidelity from 0.876 to 0.970 at a fixed emitted rate, and memories 9 through 16 serialize to the same bytes. The plain codec needs no training corpus or calibration pass, is separated above fitted 256-centroid PQ through 128 SIFT calibration vectors, and needs no refit under a controlled covariate shift that costs transferred PQ 25.9-41.5%; with a fitted PCA head it exceeds the pinned E-RaBitQ library by 7.8 to 27.9 points for ten bytes."
+keywords:
+  - approximate nearest neighbor search
+  - vector quantization
+  - trellis-coded quantization
+  - compressed indexes
+  - vector databases
+  - reproducibility
+# `message` above asks readers to cite the paper, so name it here rather than
+# leaving a citation tool to fall back on the software entry. Add the archival DOI
+# and `date-released` only after those records actually exist.
+preferred-citation:
+  type: article
+  title: "UltraVec: Trellis-Coded Quantization for Calibration-Free Low-Bit Vector Search"
+  authors:
+    - given-names: "Vladimir"
+      family-names: "Čeperić"
+      affiliation: "University of Zagreb Faculty of Electrical Engineering and Computing"
+      orcid: "https://orcid.org/0000-0002-7059-2369"
+  year: 2026

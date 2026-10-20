@@ -1,0 +1,48 @@
+bench: gist_base — 100000 vectors, dim 1024, bits [3], seed 42
+  IP metric, external queries: 200 from data/gist/gist_query.fvecs
+  evaluated queries: 200
+# Phase 2 benchmark — gist_base-ip
+
+- dim **1024**, db **100000**, queries **200**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 3 | 0.995 | 0.947 | 0.936 | 0.03612 | 203629.2 | 392 | 392 |
+| turboquant_residual | 3 | 0.980 | 0.906 | 0.907 | — | 345163.6 | 396 | 396 |
+| rabitq | 3 | 0.995 | 0.963 | 0.966 | 0.03950 | 226664.6 | 392 | 392 |
+| trellis | 3 | 0.995 | 0.977 | 0.978 | 0.01792 | 86826.1 | 394 | 4619 |
+| pvq | 3 | 1.000 | 0.963 | 0.970 | 0.03296 | 160761.8 | 394 | 394 |
+| eden | 3 | 1.000 | 0.966 | 0.967 | 0.03641 | 234178.6 | 392 | 392 |
+| blockquant | 3 | 1.000 | 0.966 | 0.974 | 0.02717 | 137649.6 | 392 | 392 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| turboquant_residual | 3 | -4.05 |
+| rabitq | 3 | +1.60 |
+| trellis | 3 | +3.00 |
+| pvq | 3 | +1.65 |
+| eden | 3 | +1.95 |
+| blockquant | 3 | +1.90 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 3 | +3.000 | [+2.100, +3.900] | lead |
+| turboquant_residual | 3 | +7.050 | [+5.900, +8.200] | lead |
+| rabitq | 3 | +1.400 | [+0.550, +2.250] | lead |
+| pvq | 3 | +1.350 | [+0.600, +2.100] | lead |
+| eden | 3 | +1.050 | [+0.250, +1.850] | lead |
+| blockquant | 3 | +1.100 | [+0.350, +1.850] | lead |
+
+**Gate 3 (gist_base-ip):** FAIL — ≥3pp recall@10 gain over baseline on this dataset.
+
+→ wrote <scratch-directory>/phase2-gist_base-ip.md
+→ wrote <scratch-directory>/phase2-gist_base-ip-per-query.csv

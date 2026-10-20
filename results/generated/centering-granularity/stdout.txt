@@ -1,0 +1,25 @@
+# Centering granularity — SIFT-100k, 2-bit, 1000 queries, raw-IP gold, seed 42, M=12
+
+Shared preprocessing: every codec receives the same centroids, so a gain here belongs to the transform and not to any one codec. Cells are Recall@10 / code bytes; the byte column includes the per-vector residual norm and centroid index that centering requires.
+
+| codec | uncentered | global mean | nlist=16 | nlist=64 | nlist=256 | nlist=1024 |
+|---|---|---|---|---|---|---|
+| blockquant | 0.5440 / 40 | 0.4640 / 44 | 0.5510 / 45 | 0.5730 / 45 | 0.5950 / 45 | 0.5790 / 46 |
+| e8 | 0.5690 / 40 | 0.4780 / 44 | 0.5610 / 45 | 0.5830 / 45 | 0.6050 / 45 | 0.6190 / 46 |
+| eden | 0.5210 / 40 | 0.4300 / 44 | 0.5150 / 45 | 0.5450 / 45 | 0.5570 / 45 | 0.5870 / 46 |
+| pvq | 0.5560 / 41 | 0.4590 / 45 | 0.5600 / 46 | 0.5750 / 46 | 0.5980 / 46 | 0.6140 / 47 |
+| rabitq | 0.5190 / 40 | 0.4310 / 44 | 0.5190 / 45 | 0.5470 / 45 | 0.5570 / 45 | 0.5820 / 46 |
+| trellis | 0.6200 / 42 | 0.5410 / 46 | 0.6280 / 47 | 0.6450 / 47 | 0.6640 / 47 | 0.6780 / 48 |
+| turboquant_baseline | 0.2870 / 40 | 0.2870 / 40 | 0.2870 / 40 | 0.2870 / 40 | 0.2870 / 40 | 0.2870 / 40 |
+| turboquant_residual | 0.3350 / 44 | 0.3350 / 44 | 0.3350 / 44 | 0.3350 / 44 | 0.3350 / 44 | 0.3350 / 44 |
+
+| granularity | trellis | best other | margin pp |
+|---|---|---|---|
+| uncentered | 0.6200 | 0.5690 | +5.10 |
+| global mean | 0.5410 | 0.4780 | +6.30 |
+| nlist=16 | 0.6280 | 0.5610 | +6.70 |
+| nlist=64 | 0.6450 | 0.5830 | +6.20 |
+| nlist=256 | 0.6640 | 0.6050 | +5.90 |
+| nlist=1024 | 0.6780 | 0.6190 | +5.90 |
+
+DONE centering_granularity

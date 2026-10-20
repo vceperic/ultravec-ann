@@ -1,0 +1,48 @@
+bench: dbpedia_base — 100000 vectors, dim 2048, bits [1], seed 42
+  IP metric, external queries: 1000 from data/dbpedia/dbpedia_query.fvecs
+  evaluated queries: 1000
+# Flat codec benchmark — dbpedia_base-ip
+
+- dim **2048**, db **100000**, queries **1000**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 1 | 0.756 | 0.738 | 0.745 | 0.35748 | 372183.9 | 264 | 304 |
+| rabitq | 1 | 0.740 | 0.735 | 0.745 | 0.39683 | 237271.9 | 264 | 312 |
+| trellis | 1 | 0.735 | 0.757 | 0.774 | 0.28799 | 142458.1 | 266 | 8522 |
+| pvq | 1 | 0.720 | 0.738 | 0.752 | 0.39049 | 47008.9 | 268 | 340 |
+| eden | 1 | 0.740 | 0.735 | 0.746 | 0.39683 | 366842.3 | 264 | 264 |
+| blockquant | 1 | 0.699 | 0.735 | 0.750 | 0.37973 | 224669.0 | 264 | 264 |
+| e8 | 1 | 0.728 | 0.740 | 0.752 | 0.34903 | 172852.1 | 264 | 264 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| rabitq | 1 | -0.30 |
+| trellis | 1 | +1.99 |
+| pvq | 1 | +0.06 |
+| eden | 1 | -0.29 |
+| blockquant | 1 | -0.29 |
+| e8 | 1 | +0.28 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 1 | +1.990 | [+1.190, +2.790] | lead |
+| rabitq | 1 | +2.290 | [+1.460, +3.130] | lead |
+| pvq | 1 | +1.930 | [+1.160, +2.720] | lead |
+| eden | 1 | +2.280 | [+1.470, +3.110] | lead |
+| blockquant | 1 | +2.280 | [+1.450, +3.110] | lead |
+| e8 | 1 | +1.710 | [+0.910, +2.530] | lead |
+
+**At least one ≥3pp recall@10 gain over the TurboQuant reference (dbpedia_base-ip):** no.
+
+→ wrote ./results/flat-dbpedia_base-ip.md
+→ wrote ./results/flat-dbpedia_base-ip-per-query.csv

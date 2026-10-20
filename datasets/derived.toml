@@ -1,0 +1,64 @@
+schema_version = 1
+
+# Deterministic outputs of the committed converters, generated from the pinned
+# source objects in manifest.toml on little-endian IEEE-754 hosts.
+
+[[file]]
+path = "sift/sift_base.fvecs"
+bytes = 516000000
+sha256 = "21f66e2975057b5728ba56de1c825bac4f4d89d596609ae985741c6242631816"
+sources = ["sift"]
+
+[[file]]
+path = "sift/sift_query.fvecs"
+bytes = 5160000
+sha256 = "f7fc9be140accdfd64116c2fa2365ecdb69b8f084970c6b0532db5ff79ac8fdc"
+sources = ["sift"]
+
+[[file]]
+path = "siftsmall/siftsmall_base.fvecs"
+bytes = 5160000
+sha256 = "1e90414a3254361aba48a0d58e461f7661fb135dabb3da985290e94de8f60fe0"
+sources = ["sift"]
+
+[[file]]
+path = "siftsmall/siftsmall_query.fvecs"
+bytes = 51600
+sha256 = "095af38bda2741be721447ba97e9286fa918ece946be92a9ae133276eddc1a10"
+sources = ["sift"]
+
+[[file]]
+path = "gist/gist_base.fvecs"
+bytes = 3844000000
+sha256 = "73418110328f5aa522d9f6b0cd9115a6c515dc44e3c48420e506ddeddbdbdbc0"
+sources = ["gist"]
+
+[[file]]
+path = "gist/gist_query.fvecs"
+bytes = 3844000
+sha256 = "0d1d620049de12da455ed7201e97cbab372c4d54d0e6dedbc8c503f62c911299"
+sources = ["gist"]
+
+[[file]]
+path = "glove/glove_base.fvecs"
+bytes = 123085456
+sha256 = "d1354be05459f7b614ffc99139581387e7c5451a98e483d7c059cdd250ba0812"
+sources = ["glove"]
+
+[[file]]
+path = "glove/glove_query.fvecs"
+bytes = 1040000
+sha256 = "43a0e4ae4c25e84e5bfba879282e8a477c7a11a96cf2cc875ccedf97ae76bb1d"
+sources = ["glove"]
+
+[[file]]
+path = "dbpedia/dbpedia_base.fvecs"
+bytes = 614800000
+sha256 = "ae5157b9342a223bda8e0d983e5850c3825dca3074303dd92aa1f349af71ef52"
+sources = ["dbpedia-00", "dbpedia-01", "dbpedia-02"]
+
+[[file]]
+path = "dbpedia/dbpedia_query.fvecs"
+bytes = 6148000
+sha256 = "12801afd8ffba47feebe410792a962fb1200787651088179fd8184492b1c31a7"
+sources = ["dbpedia-00", "dbpedia-01", "dbpedia-02"]

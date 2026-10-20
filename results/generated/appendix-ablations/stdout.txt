@@ -1,0 +1,74 @@
+# Journal appendix ablations — SIFT-100k (100000 db / 1000 q), Recall@10 vs fp32 cosine
+
+## 1. Computed inverse-CDF code vs byte-sum 1MAD (the codebook lever), M=12
+  2-bit: computed 0.6202  vs  1MAD 0.6056   (computed - 1MAD = +0.0146)
+  3-bit: computed 0.7997  vs  1MAD 0.7873   (computed - 1MAD = +0.0124)
+  4-bit: computed 0.8912  vs  1MAD 0.8762   (computed - 1MAD = +0.0150)
+
+## 2. Free-start vs fixed-start (the free-start lever), M=12
+  2-bit: free 0.6202  vs  fixed 0.5875   (free - fixed = +0.0327)
+  3-bit: free 0.7997  vs  fixed 0.7729   (free - fixed = +0.0268)
+  4-bit: free 0.8912  vs  fixed 0.8765   (free - fixed = +0.0147)
+
+## 2b. Tail-biting vs free start (the start-state byte), M=12
+  2-bit: free 0.6202  vs  tail-biting 0.5384   (tail - free = -0.0818)
+  3-bit: free 0.7997  vs  tail-biting 0.7258   (tail - free = -0.0739)
+  4-bit: free 0.8912  vs  tail-biting 0.8256   (tail - free = -0.0656)
+
+## 3. Beam-width sweep at M=12, 2-bit (exact vs beam-search encode)
+  beam=exact: 0.6202
+  beam=4: 0.4326
+  beam=8: 0.5080
+  beam=16: 0.5459
+
+## 3b. Beam width at high state memory, 2-bit (beam cost is independent of 2^M)
+  W=64  M=14: 0.5915
+  W=64  M=16: 0.5874
+  W=64  M=18: 0.5904
+  W=64  M=20: 0.5887
+  W=64  M=22: 0.5983
+  W=128  M=14: 0.6066
+  W=128  M=16: 0.5998
+  W=128  M=18: 0.5971
+  W=128  M=20: 0.6035
+  W=128  M=22: 0.5988
+
+## 4. Per-bit x per-M recall table (the fidelity knob)
+    M    2-bit    3-bit    4-bit
+    4   0.5281   0.7234   0.8424
+    6   0.5696   0.7629   0.8686
+    8   0.5943   0.7809   0.8798
+   10   0.6082   0.7903   0.8851
+   12   0.6202   0.7997   0.8912
+   14   0.6217   0.8021   0.8950
+
+## 5. Rotation rounds at M=12, 2-bit (shared preprocessing, all codecs)
+  rounds=1: 0.6151
+  rounds=2: 0.6198
+  rounds=3: 0.6202
+  rounds=4: 0.6168
+
+## 5b. Rotation rounds per codec at M=12, 2-bit (the shared-preprocessing claim)
+| codec | r=1 | r=2 | r=3 | r=4 | r=3 minus r=1 |
+|---|---|---|---|---|---|
+| blockquant | 0.5470 | 0.5420 | 0.5420 | 0.5490 | -0.50 |
+| e8 | 0.5440 | 0.5600 | 0.5660 | 0.5670 | +2.20 |
+| eden | 0.5270 | 0.5200 | 0.5180 | 0.5260 | -0.90 |
+| pvq | 0.5490 | 0.5560 | 0.5590 | 0.5510 | +1.00 |
+| rabitq | 0.5200 | 0.5130 | 0.5170 | 0.5260 | -0.30 |
+| trellis | 0.6150 | 0.6190 | 0.6210 | 0.6160 | +0.60 |
+| turboquant_baseline | 0.2920 | 0.2880 | 0.2840 | 0.2710 | -0.80 |
+| turboquant_residual | 0.3420 | 0.3330 | 0.3340 | 0.3330 | -0.80 |
+
+| rounds | trellis | best other | margin pp |
+|---|---|---|---|
+| 1 | 0.6150 | 0.5490 | +6.60 |
+| 2 | 0.6190 | 0.5600 | +5.90 |
+| 3 | 0.6210 | 0.5660 | +5.50 |
+| 4 | 0.6160 | 0.5670 | +4.90 |
+
+## 6. Anisotropic branch metric at M=12, 2-bit (w_i = 1 + lambda*x_i^2)
+  lambda=0.0: 0.6202
+  lambda=0.5: 0.6059
+  lambda=1.0: 0.5935
+  lambda=2.0: 0.5759

@@ -1,0 +1,48 @@
+bench: glove_base — 59500 vectors, dim 32, bits [1], seed 42
+  IP metric, external queries: 200 from data/glove/glove_query.fvecs
+  evaluated queries: 200
+# Phase 2 benchmark — glove_base-ip
+
+- dim **32**, db **59500**, queries **200**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 1 | 0.240 | 0.337 | 0.415 | 0.36031 | 6139.1 | 12 | 12 |
+| rabitq | 1 | 0.210 | 0.313 | 0.397 | 0.40015 | 6013.7 | 12 | 12 |
+| trellis | 1 | 0.395 | 0.518 | 0.577 | 0.19098 | 3398.9 | 14 | 270 |
+| pvq | 1 | 0.215 | 0.330 | 0.432 | 0.35705 | 3101.3 | 13 | 13 |
+| eden | 1 | 0.210 | 0.313 | 0.397 | 0.40015 | 7415.5 | 12 | 12 |
+| blockquant | 1 | 0.220 | 0.342 | 0.424 | 0.36755 | 5117.6 | 12 | 12 |
+| e8 | 1 | 0.270 | 0.361 | 0.444 | 0.34094 | 4568.1 | 12 | 12 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| rabitq | 1 | -2.40 |
+| trellis | 1 | +18.10 |
+| pvq | 1 | -0.70 |
+| eden | 1 | -2.40 |
+| blockquant | 1 | +0.50 |
+| e8 | 1 | +2.35 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 1 | +18.100 | [+15.850, +20.350] | lead |
+| rabitq | 1 | +20.500 | [+18.350, +22.650] | lead |
+| pvq | 1 | +18.800 | [+16.300, +21.250] | lead |
+| eden | 1 | +20.500 | [+18.350, +22.700] | lead |
+| blockquant | 1 | +17.600 | [+14.950, +20.200] | lead |
+| e8 | 1 | +15.750 | [+13.450, +18.100] | lead |
+
+**Gate 3 (glove_base-ip):** PASS — ≥3pp recall@10 gain over baseline on this dataset.
+
+→ wrote <scratch-directory>/phase2-glove_base-ip.md
+→ wrote <scratch-directory>/phase2-glove_base-ip-per-query.csv

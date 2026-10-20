@@ -1,0 +1,48 @@
+bench: glove_base — 59500 vectors, dim 32, bits [4], seed 42
+  IP metric, external queries: 200 from data/glove/glove_query.fvecs
+  evaluated queries: 200
+# Phase 2 benchmark — glove_base-ip
+
+- dim **32**, db **59500**, queries **200**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 4 | 0.780 | 0.831 | 0.875 | 0.00907 | 6675.0 | 24 | 24 |
+| turboquant_residual | 4 | 0.670 | 0.760 | 0.805 | — | 11205.4 | 28 | 28 |
+| rabitq | 4 | 0.865 | 0.889 | 0.916 | 0.00746 | 6514.1 | 24 | 24 |
+| trellis | 4 | 0.875 | 0.919 | 0.945 | 0.00299 | 3539.0 | 26 | 286 |
+| pvq | 4 | 0.775 | 0.832 | 0.868 | 0.02195 | 4064.9 | 25 | 25 |
+| eden | 4 | 0.820 | 0.879 | 0.908 | 0.00846 | 7612.7 | 24 | 24 |
+| blockquant | 4 | 0.850 | 0.890 | 0.916 | 0.00729 | 6306.3 | 24 | 24 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| turboquant_residual | 4 | -7.10 |
+| rabitq | 4 | +5.80 |
+| trellis | 4 | +8.80 |
+| pvq | 4 | +0.05 |
+| eden | 4 | +4.75 |
+| blockquant | 4 | +5.90 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 4 | +8.800 | [+7.350, +10.250] | lead |
+| turboquant_residual | 4 | +15.900 | [+14.250, +17.550] | lead |
+| rabitq | 4 | +3.000 | [+1.800, +4.200] | lead |
+| pvq | 4 | +8.750 | [+7.300, +10.250] | lead |
+| eden | 4 | +4.050 | [+2.750, +5.350] | lead |
+| blockquant | 4 | +2.900 | [+1.650, +4.150] | lead |
+
+**Gate 3 (glove_base-ip):** PASS — ≥3pp recall@10 gain over baseline on this dataset.
+
+→ wrote <scratch-directory>/phase2-glove_base-ip.md
+→ wrote <scratch-directory>/phase2-glove_base-ip-per-query.csv

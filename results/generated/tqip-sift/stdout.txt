@@ -1,0 +1,50 @@
+bench: sift_base — 100000 vectors, dim 128, bits [2, 3, 4], seed 42
+  IP metric, external queries: 1000 from data/sift/sift_query.fvecs
+  evaluated queries: 1000
+# Flat codec benchmark — sift_base-ip
+
+- dim **128**, db **100000**, queries **1000**, seed **42**
+- recall is **pre-rerank** (the quantizer's own quality; an exact-f32 rerank would restore ~1.0 for all)
+
+- MIPS code and resident bytes include the exact database norm: already present in TurboQuant's record, otherwise a 4-byte sidecar.
+
+| quantizer | bits | R@1 | R@10 | R@100 | recon MSE | query µs (p50) | code B/vec | resident B/vec |
+|---|---|---|---|---|---|---|---|---|
+| turboquant_baseline | 2 | 0.167 | 0.287 | 0.413 | 0.12561 | 49378.5 | 40 | 80 |
+| turboquant_residual | 2 | 0.162 | 0.235 | 0.364 | — | 67790.8 | 44 | 44 |
+| trellis | 2 | 0.516 | 0.630 | 0.716 | 0.05927 | 16637.0 | 42 | 623 |
+| turboquant_baseline | 3 | 0.303 | 0.401 | 0.542 | 0.03967 | 48563.5 | 56 | 96 |
+| turboquant_residual | 3 | 0.288 | 0.381 | 0.519 | — | 69078.9 | 60 | 60 |
+| trellis | 3 | 0.741 | 0.802 | 0.855 | 0.01480 | 17330.9 | 58 | 644 |
+| turboquant_baseline | 4 | 0.449 | 0.571 | 0.681 | 0.01142 | 50884.1 | 72 | 112 |
+| turboquant_residual | 4 | 0.422 | 0.571 | 0.687 | — | 69474.3 | 76 | 76 |
+| trellis | 4 | 0.850 | 0.896 | 0.927 | 0.00370 | 17902.2 | 74 | 670 |
+
+## Δ recall@10 vs TurboQuant baseline (percentage points)
+
+| variant | bits | Δpp@10 |
+|---|---|---|
+| turboquant_residual | 2 | -5.13 |
+| trellis | 2 | +34.28 |
+| turboquant_residual | 3 | -2.02 |
+| trellis | 3 | +40.14 |
+| turboquant_residual | 4 | +0.01 |
+| trellis | 4 | +32.46 |
+
+## Paired query-bootstrap Recall@10 comparisons
+
+UltraVec minus comparator in percentage points; 95% percentile interval from 10000 paired resamples. "lead"/"behind" requires the interval to exclude zero.
+
+| comparator | bits | Δpp@10 | 95% CI | outcome |
+|---|---|---|---|---|
+| turboquant_baseline | 2 | +34.280 | [+33.150, +35.420] | lead |
+| turboquant_residual | 2 | +39.410 | [+38.310, +40.480] | lead |
+| turboquant_baseline | 3 | +40.140 | [+39.040, +41.240] | lead |
+| turboquant_residual | 3 | +42.160 | [+41.030, +43.300] | lead |
+| turboquant_baseline | 4 | +32.460 | [+31.400, +33.530] | lead |
+| turboquant_residual | 4 | +32.450 | [+31.410, +33.490] | lead |
+
+**At least one ≥3pp recall@10 gain over the TurboQuant reference (sift_base-ip):** yes.
+
+→ wrote ./results/flat-sift_base-ip.md
+→ wrote ./results/flat-sift_base-ip-per-query.csv
